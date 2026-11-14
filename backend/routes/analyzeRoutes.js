@@ -57,9 +57,10 @@ router.post('/data', uploadLimiter, uploadMiddleware, async (req, res, next) => 
         const textContent = req.file.buffer.toString('utf8');
         rawRows = parseRawText(textContent);
       }
-    } else if (req.body && req.body.rawText) {
+    } else if (req.body && (req.body.rawText || req.body.rawCsv || req.body.data || req.body.csv)) {
       fileName = 'pasted_records.csv';
-      rawRows = parseRawText(req.body.rawText);
+      const textToParse = req.body.rawText || req.body.rawCsv || req.body.data || req.body.csv;
+      rawRows = parseRawText(textToParse);
     } else {
       return res.status(400).json({
         success: false,

@@ -8,10 +8,16 @@
 const fs = require('fs/promises');
 const path = require('path');
 const crypto = require('crypto');
+const os = require('os');
 const supabase = require('./supabase');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+const SEED_FILE = path.join(__dirname, '..', 'data', 'nirvair_db.json');
+const DATA_DIR = isServerless ? os.tmpdir() : path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'nirvair_db.json');
+
+// Memory cache fallback ensuring zero downtime on read-only environments
+let inMemoryDb = null;
 
 const INITIAL_DB = {
   citizen_reports: [
@@ -110,26 +116,37 @@ async function ensureDir() {
 }
 
 async function loadDB() {
-  await ensureDir();
+  if (inMemoryDb) return inMemoryDb;
+
   try {
+    await ensureDir();
     const raw = await fs.readFile(DB_FILE, 'utf8');
-    return JSON.parse(raw);
+    inMemoryDb = JSON.parse(raw);
+    return inMemoryDb;
   } catch (err) {
-    if (err.code === 'ENOENT') {
-      await saveDB(INITIAL_DB);
-      return JSON.parse(JSON.stringify(INITIAL_DB));
+    try {
+      const seedRaw = await fs.readFile(SEED_FILE, 'utf8');
+      inMemoryDb = JSON.parse(seedRaw);
+      await saveDB(inMemoryDb).catch(() => {});
+      return inMemoryDb;
+    } catch (seedErr) {
+      inMemoryDb = JSON.parse(JSON.stringify(INITIAL_DB));
+      await saveDB(inMemoryDb).catch(() => {});
+      return inMemoryDb;
     }
-    console.error('Error reading DB, re-initializing from default:', err.message);
-    await saveDB(INITIAL_DB);
-    return JSON.parse(JSON.stringify(INITIAL_DB));
   }
 }
 
 async function saveDB(data) {
-  await ensureDir();
-  const tempPath = `${DB_FILE}.${Date.now()}.${crypto.randomBytes(4).toString('hex')}.tmp`;
-  await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf8');
-  await fs.rename(tempPath, DB_FILE);
+  inMemoryDb = data;
+  try {
+    await ensureDir();
+    const tempPath = `${DB_FILE}.${Date.now()}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+    await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf8');
+    await fs.rename(tempPath, DB_FILE);
+  } catch (err) {
+    console.warn('Persistent write notice (cached in-memory):', err.message);
+  }
 }
 
 // Database interface methods with Supabase synchronization

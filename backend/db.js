@@ -1,12 +1,14 @@
 /**
- * Persistent Storage Layer for NIRVAIR.
- * Stores citizen reports, interventions, historical AQI snapshots, and uploaded dataset records.
- * Uses atomic JSON persistence to ensure zero native build issues and guaranteed portability.
+ * Asynchronous Persistent Storage Layer for NIRVAIR.
+ * Features dual-tier hybrid persistence:
+ * 1. Cloud Supabase PostgreSQL database (https://ymfyrxojlxxycjqdmixb.supabase.co)
+ * 2. High-speed atomic local JSON storage with write-queue lock for zero downtime and full offline resilience.
  */
 
-const fs = require('fs');
+const fs = require('fs/promises');
 const path = require('path');
 const crypto = require('crypto');
+const supabase = require('./supabase');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'nirvair_db.json');
@@ -88,40 +90,56 @@ const INITIAL_DB = {
   datasets: []
 };
 
-function ensureDir(dirPath) {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+// Promise-based write-queue lock ensuring atomic serialized mutations
+let writeQueue = Promise.resolve();
+
+function withWriteLock(fn) {
+  const next = writeQueue.then(async () => {
+    return await fn();
+  });
+  writeQueue = next.catch(() => {});
+  return next;
+}
+
+async function ensureDir() {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
   }
 }
 
-function loadDB() {
-  ensureDir(DATA_DIR);
-  if (!fs.existsSync(DB_FILE)) {
-    saveDB(INITIAL_DB);
-    return JSON.parse(JSON.stringify(INITIAL_DB));
-  }
+async function loadDB() {
+  await ensureDir();
   try {
-    const raw = fs.readFileSync(DB_FILE, 'utf8');
+    const raw = await fs.readFile(DB_FILE, 'utf8');
     return JSON.parse(raw);
   } catch (err) {
-    console.error('Error reading DB, re-initializing:', err.message);
-    saveDB(INITIAL_DB);
+    if (err.code === 'ENOENT') {
+      await saveDB(INITIAL_DB);
+      return JSON.parse(JSON.stringify(INITIAL_DB));
+    }
+    console.error('Error reading DB, re-initializing from default:', err.message);
+    await saveDB(INITIAL_DB);
     return JSON.parse(JSON.stringify(INITIAL_DB));
   }
 }
 
-function saveDB(data) {
-  ensureDir(DATA_DIR);
-  const tempPath = `${DB_FILE}.${Date.now()}.tmp`;
-  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
-  fs.renameSync(tempPath, DB_FILE);
+async function saveDB(data) {
+  await ensureDir();
+  const tempPath = `${DB_FILE}.${Date.now()}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+  await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf8');
+  await fs.rename(tempPath, DB_FILE);
 }
 
-// Database helper functions
+// Database interface methods with Supabase synchronization
 const db = {
   // Citizen Reports
-  getCitizenReports: (filter = {}) => {
-    const state = loadDB();
+  getCitizenReports: async (filter = {}) => {
+    const cloud = await supabase.getCitizenReports(filter);
+    if (cloud && cloud.length > 0) return cloud;
+
+    const state = await loadDB();
     let reports = state.citizen_reports || [];
     if (filter.locality) {
       reports = reports.filter(r => r.locality.toLowerCase().includes(filter.locality.toLowerCase()));
@@ -129,29 +147,37 @@ const db = {
     return reports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   },
 
-  addCitizenReport: (report) => {
-    const state = loadDB();
-    const id = 'cr-' + crypto.randomUUID().slice(0, 8);
-    const newReport = {
-      id,
-      latitude: Number(report.latitude),
-      longitude: Number(report.longitude),
-      locality: String(report.locality || 'Unknown Locality'),
-      report_type: String(report.report_type || 'other'),
-      severity: String(report.severity || 'moderate'),
-      description: String(report.description || '').slice(0, 1000),
-      timestamp: new Date().toISOString(),
-      status: 'pending'
-    };
-    state.citizen_reports = state.citizen_reports || [];
-    state.citizen_reports.unshift(newReport);
-    saveDB(state);
-    return newReport;
+  addCitizenReport: async (report) => {
+    return withWriteLock(async () => {
+      const state = await loadDB();
+      const id = 'cr-' + crypto.randomUUID().slice(0, 8);
+      const newReport = {
+        id,
+        latitude: Number(report.latitude),
+        longitude: Number(report.longitude),
+        locality: String(report.locality || 'Unknown Locality'),
+        report_type: String(report.report_type || 'other'),
+        severity: String(report.severity || 'moderate'),
+        description: String(report.description || '').slice(0, 1000),
+        timestamp: new Date().toISOString(),
+        status: 'pending'
+      };
+      state.citizen_reports = state.citizen_reports || [];
+      state.citizen_reports.unshift(newReport);
+      await saveDB(state);
+
+      // Async sync to Supabase (non-blocking)
+      supabase.addCitizenReport(newReport).catch(() => {});
+      return newReport;
+    });
   },
 
   // Interventions
-  getInterventions: (filter = {}) => {
-    const state = loadDB();
+  getInterventions: async (filter = {}) => {
+    const cloud = await supabase.getInterventions(filter);
+    if (cloud && cloud.length > 0) return cloud;
+
+    const state = await loadDB();
     let list = state.interventions || [];
     if (filter.role) {
       list = list.filter(i => i.role === filter.role);
@@ -163,7 +189,6 @@ const db = {
   },
 
   addIntervention: (intv) => {
-    const state = loadDB();
     const id = 'int-' + crypto.randomUUID().slice(0, 8);
     const item = {
       id,
@@ -181,65 +206,97 @@ const db = {
       created_at: new Date().toISOString(),
       completed_at: intv.status === 'completed' ? new Date().toISOString() : null
     };
-    state.interventions = state.interventions || [];
-    state.interventions.unshift(item);
-    saveDB(state);
-    return item;
+
+    const p = withWriteLock(async () => {
+      const state = await loadDB();
+      state.interventions = state.interventions || [];
+      state.interventions.unshift(item);
+      await saveDB(state);
+
+      supabase.addIntervention(item).catch(() => {});
+      return item;
+    });
+
+    Object.assign(p, item);
+    return p;
   },
 
   updateIntervention: (id, updates) => {
-    const state = loadDB();
-    state.interventions = state.interventions || [];
-    const index = state.interventions.findIndex(i => i.id === id);
-    if (index === -1) return null;
-
-    const current = state.interventions[index];
-    const updated = {
-      ...current,
+    let syncMeta = {
+      id,
       ...updates,
-      completed_at: updates.status === 'completed' && !current.completed_at ? new Date().toISOString() : current.completed_at
+      completed_at: updates.status === 'completed' ? new Date().toISOString() : undefined
     };
-    state.interventions[index] = updated;
-    saveDB(state);
-    return updated;
+
+    const p = withWriteLock(async () => {
+      const state = await loadDB();
+      state.interventions = state.interventions || [];
+      const index = state.interventions.findIndex(i => i.id === id);
+      if (index === -1) return null;
+
+      const current = state.interventions[index];
+      const updated = {
+        ...current,
+        ...updates,
+        completed_at: updates.status === 'completed' && !current.completed_at ? new Date().toISOString() : current.completed_at
+      };
+      state.interventions[index] = updated;
+      await saveDB(state);
+
+      supabase.updateIntervention(id, updates).catch(() => {});
+      return updated;
+    });
+
+    Object.assign(p, syncMeta);
+    return p;
   },
 
-  deleteIntervention: (id) => {
-    const state = loadDB();
-    state.interventions = state.interventions || [];
-    const initialLen = state.interventions.length;
-    state.interventions = state.interventions.filter(i => i.id !== id);
-    saveDB(state);
-    return state.interventions.length < initialLen;
+  deleteIntervention: async (id) => {
+    return withWriteLock(async () => {
+      const state = await loadDB();
+      state.interventions = state.interventions || [];
+      const initialLen = state.interventions.length;
+      state.interventions = state.interventions.filter(i => i.id !== id);
+      await saveDB(state);
+
+      supabase.deleteIntervention(id).catch(() => {});
+      return state.interventions.length < initialLen;
+    });
   },
 
   // AQI History Snapshots
-  recordAQISnapshot: (record) => {
-    const state = loadDB();
-    const id = 'snap-' + crypto.randomUUID().slice(0, 8);
-    const item = {
-      id,
-      locality: record.locality,
-      latitude: record.latitude,
-      longitude: record.longitude,
-      aqi: record.aqi,
-      category: record.category,
-      pm25: record.pm25,
-      pm10: record.pm10,
-      station_name: record.station_name,
-      station_distance_km: record.station_distance_km,
-      recorded_at: new Date().toISOString()
-    };
-    state.aqi_history = state.aqi_history || [];
-    state.aqi_history.unshift(item);
-    // Keep max 100 history items
-    if (state.aqi_history.length > 100) state.aqi_history = state.aqi_history.slice(0, 100);
-    saveDB(state);
-    return item;
+  recordAQISnapshot: async (record) => {
+    return withWriteLock(async () => {
+      const state = await loadDB();
+      const id = 'snap-' + crypto.randomUUID().slice(0, 8);
+      const item = {
+        id,
+        locality: record.locality,
+        latitude: record.latitude,
+        longitude: record.longitude,
+        aqi: record.aqi,
+        category: record.category,
+        pm25: record.pm25,
+        pm10: record.pm10,
+        station_name: record.station_name,
+        station_distance_km: record.station_distance_km,
+        recorded_at: new Date().toISOString()
+      };
+      state.aqi_history = state.aqi_history || [];
+      state.aqi_history.unshift(item);
+      if (state.aqi_history.length > 100) state.aqi_history = state.aqi_history.slice(0, 100);
+      await saveDB(state);
+
+      supabase.recordAQISnapshot(item).catch(() => {});
+      return item;
+    });
   },
 
-  getAQIHistory: (locality) => {
-    const state = loadDB();
+  getAQIHistory: async (locality) => {
+    const cloud = await supabase.getAQIHistory(locality);
+    if (cloud && cloud.length > 0) return cloud;
+
+    const state = await loadDB();
     let hist = state.aqi_history || [];
     if (locality) {
       hist = hist.filter(h => h.locality.toLowerCase().includes(locality.toLowerCase()));
@@ -248,16 +305,23 @@ const db = {
   },
 
   // Uploaded Datasets
-  recordDataset: (dataset) => {
-    const state = loadDB();
-    state.datasets = state.datasets || [];
-    state.datasets.unshift(dataset);
-    saveDB(state);
-    return dataset;
+  recordDataset: async (dataset) => {
+    return withWriteLock(async () => {
+      const state = await loadDB();
+      state.datasets = state.datasets || [];
+      state.datasets.unshift(dataset);
+      await saveDB(state);
+
+      supabase.recordDataset(dataset).catch(() => {});
+      return dataset;
+    });
   },
 
-  getDatasets: () => {
-    const state = loadDB();
+  getDatasets: async () => {
+    const cloud = await supabase.getDatasets();
+    if (cloud && cloud.length > 0) return cloud;
+
+    const state = await loadDB();
     return state.datasets || [];
   }
 };

@@ -1,881 +1,610 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NIRVAIR | Know Your Air. Understand Your Neighbourhood. Take Action.</title>
-  
-  <!-- Primary Meta Tags -->
-  <meta name="description" content="AI-driven civic air-quality intelligence platform transforming raw air data into neighbourhood understanding and measurable civic action.">
-  <meta name="theme-color" content="#0b0f19">
+  <title>NIRVAIR — Civic Air-Quality Intelligence Platform</title>
+  <meta name="description" content="AI-driven civic air-quality intelligence: Understand your neighbourhood, compare perception with reality, and execute measurable civic interventions.">
 
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Custom App CSS -->
+  <!-- Google-Minimalist Design System & App CSS -->
   <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+<body>
 
   <!-- ============================================================== -->
   <!-- ACCESSIBILITY: SKIP TO MAIN CONTENT LINK (WCAG 2.2 AA)        -->
   <!-- ============================================================== -->
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:font-bold focus:rounded-lg focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white">
+  <a href="#main-content" class="sr-only focus:not-sr-only" aria-label="Skip directly to main content">
     Skip to main content
   </a>
 
   <!-- ============================================================== -->
-  <!-- TOP NAVIGATION BAR                                             -->
+  <!-- FIXED APP HEADER                                              -->
   <!-- ============================================================== -->
-  <header role="banner" class="sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Logo & Brand -->
-      <a href="#main-content" onclick="switchTab('workflow-a')" class="flex items-center space-x-3 cursor-pointer group" aria-label="NIRVAIR Home">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-400 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:opacity-90 transition">
-          <i data-lucide="wind" class="w-5 h-5 text-white" aria-hidden="true"></i>
-        </div>
-        <div>
-          <div class="flex items-center space-x-2">
-            <span class="font-extrabold text-xl tracking-tight text-white">NIRVAIR</span>
-            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Civic AI</span>
-          </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">Know Your Air. Understand Your Neighbourhood. Take Action.</p>
-        </div>
-      </a>
-
-      <!-- Navigation Tabs (Role Tablist for Screen Readers) -->
-      <nav class="hidden md:flex items-center space-x-1" id="app-tabs" role="tablist" aria-label="Application Workflows">
-        <button onclick="switchTab('workflow-a')" id="tab-btn-workflow-a" role="tab" aria-selected="true" aria-controls="section-workflow-a" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-white bg-slate-800/80 border border-slate-700/60 shadow-sm flex items-center space-x-2">
-          <i data-lucide="map-pin" class="w-4 h-4 text-blue-400" aria-hidden="true"></i>
-          <span>Understand My Air</span>
-        </button>
-        <button onclick="switchTab('workflow-b')" id="tab-btn-workflow-b" role="tab" aria-selected="false" aria-controls="section-workflow-b" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
-          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400" aria-hidden="true"></i>
-          <span>Analyse My Data</span>
-        </button>
-        <button onclick="switchTab('workflow-c')" id="tab-btn-workflow-c" role="tab" aria-selected="false" aria-controls="section-workflow-c" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
-          <i data-lucide="list-checks" class="w-4 h-4 text-purple-400" aria-hidden="true"></i>
-          <span>Intervention Memory</span>
-          <span id="nav-intervention-count" class="text-xs bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded-full border border-purple-500/30" aria-label="2 tracked interventions">2</span>
-        </button>
-        <button onclick="switchTab('workflow-d')" id="tab-btn-workflow-d" role="tab" aria-selected="false" aria-controls="section-workflow-d" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
-          <i data-lucide="file-text" class="w-4 h-4 text-amber-400" aria-hidden="true"></i>
-          <span>Civic Reports</span>
-        </button>
-      </nav>
-
-      <!-- Live Connectivity Badge -->
-      <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full text-xs" role="status" aria-label="Live backend status: Open-Meteo & Gemini AI Active">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live" aria-hidden="true"></span>
-        <span class="text-slate-300 font-mono text-[11px] hidden sm:inline">Open-Meteo & Gemini 3.8</span>
-        <span class="text-slate-300 font-mono text-[11px] sm:hidden">Live</span>
+  <header class="app-header" role="banner">
+    <div class="brand-wrapper">
+      <div class="brand-icon" aria-hidden="true">N</div>
+      <div>
+        <span class="brand-title">NIRVAIR</span>
+        <span class="brand-tagline"> • Civic Air Intelligence</span>
       </div>
+    </div>
+
+    <!-- Evaluator Auth Badge & Header Controls -->
+    <div class="header-status-group">
+      <div id="evaluator-status-badge" class="evaluator-badge" role="status" aria-live="polite">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5" aria-hidden="true"></i>
+        <span id="evaluator-name">Guest (Demo Gateway)</span>
+      </div>
+      
+      <button type="button" class="logout-btn" id="header-report-btn" onclick="openCitizenReportModal()" aria-label="Report Local Civic Incident">
+        📢 Report Incident
+      </button>
+
+      <button type="button" class="logout-btn" id="header-logout-btn" onclick="handleLogout()" aria-label="Log out of session">
+        Logout
+      </button>
     </div>
   </header>
 
-  <!-- Mobile Tab Navigation Bar -->
-  <div class="md:hidden flex overflow-x-auto border-b border-slate-800 bg-slate-900/60 px-2 py-2 space-x-1 text-xs" role="tablist" aria-label="Mobile Navigation">
-    <button onclick="switchTab('workflow-a')" id="mob-tab-btn-workflow-a" role="tab" aria-selected="true" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-white bg-slate-800 border border-slate-700">Understand Air</button>
-    <button onclick="switchTab('workflow-b')" id="mob-tab-btn-workflow-b" role="tab" aria-selected="false" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Analyse Data</button>
-    <button onclick="switchTab('workflow-c')" id="mob-tab-btn-workflow-c" role="tab" aria-selected="false" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Interventions</button>
-    <button onclick="switchTab('workflow-d')" id="mob-tab-btn-workflow-d" role="tab" aria-selected="false" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Civic Reports</button>
+  <!-- ============================================================== -->
+  <!-- FIXED ANIMATED SVG CURVED ROADMAP (6 STEPS)                    -->
+  <!-- ============================================================== -->
+  <div class="roadmap-container" aria-hidden="true">
+    <svg class="fixed-roadmap-svg" id="fixed-roadmap-svg" viewBox="0 0 1100 52" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="roadmap-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1A73E8" />
+          <stop offset="100%" stop-color="#4285F4" />
+        </linearGradient>
+      </defs>
+      <!-- Base grey curved track -->
+      <path id="roadmap-bg-path" class="roadmap-bg-path" d="M 50,26 C 240,6 310,46 500,26 C 690,6 760,46 1050,26" fill="none" />
+      <!-- Animated Google blue progressive progress line -->
+      <path id="roadmap-progress-path" class="roadmap-progress-path" d="M 50,26 C 240,6 310,46 500,26 C 690,6 760,46 1050,26" fill="none" stroke="url(#roadmap-grad)" />
+      
+      <!-- 6 Milestone Nodes -->
+      <g id="roadmap-milestones">
+        <circle class="roadmap-node" id="node-0" cx="50" cy="26" r="6" fill="#1A73E8" stroke="#1A73E8" stroke-width="2.5" onclick="goToSlide(0)" />
+        <circle class="roadmap-node" id="node-1" cx="250" cy="26" r="6" fill="#FFFFFF" stroke="#E8EAED" stroke-width="2.5" onclick="goToSlide(1)" />
+        <circle class="roadmap-node" id="node-2" cx="450" cy="26" r="6" fill="#FFFFFF" stroke="#E8EAED" stroke-width="2.5" onclick="goToSlide(2)" />
+        <circle class="roadmap-node" id="node-3" cx="650" cy="26" r="6" fill="#FFFFFF" stroke="#E8EAED" stroke-width="2.5" onclick="goToSlide(3)" />
+        <circle class="roadmap-node" id="node-4" cx="850" cy="26" r="6" fill="#FFFFFF" stroke="#E8EAED" stroke-width="2.5" onclick="goToSlide(4)" />
+        <circle class="roadmap-node" id="node-5" cx="1050" cy="26" r="6" fill="#FFFFFF" stroke="#E8EAED" stroke-width="2.5" onclick="goToSlide(5)" />
+      </g>
+      <!-- Active marker circle moving smoothly along curve -->
+      <circle id="roadmap-marker-dot" cx="50" cy="26" r="8" fill="#1A73E8" stroke="#FFFFFF" stroke-width="2.5" />
+    </svg>
   </div>
 
-  <!-- MAIN WORKSPACE CONTAINER -->
-  <main id="main-content" role="main" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12" tabindex="-1">
+  <!-- ============================================================== -->
+  <!-- 6-SLIDE HORIZONTAL VIEWPORT CONTAINER                          -->
+  <!-- ============================================================== -->
+  <div class="viewport-container" id="viewport-container">
+    <main id="main-content" class="slides-track" role="main">
 
-    <!-- ============================================================== -->
-    <!-- WORKFLOW A: UNDERSTAND MY AIR (CITIZEN & CIVIC INTELLIGENCE)  -->
-    <!-- ============================================================== -->
-    <div id="section-workflow-a" role="tabpanel" aria-labelledby="tab-btn-workflow-a" class="space-y-12">
-
-      <!-- HERO LANDING SECTION -->
-      <section role="region" aria-labelledby="hero-heading" class="text-center pt-6 pb-4 max-w-3xl mx-auto space-y-4">
-        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider">
-          <i data-lucide="shield-alert" class="w-3.5 h-3.5" aria-hidden="true"></i>
-          <span>Civic Air-Quality Intelligence</span>
-        </div>
-        <h1 id="hero-heading" class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-          Do you really know what you're <span class="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">breathing?</span>
-        </h1>
-        <p class="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-          Discover the air around you, understand the possible sources of pollution, and find out what you can do about it.
-        </p>
-
-        <!-- Primary & Secondary CTAs -->
-        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <a href="#perception-section" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-600/30 flex items-center space-x-2">
-            <i data-lucide="compass" class="w-4 h-4" aria-hidden="true"></i>
-            <span>Explore My Air</span>
-          </a>
-          <button onclick="switchTab('workflow-b')" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-semibold text-sm transition-all flex items-center space-x-2">
-            <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400" aria-hidden="true"></i>
-            <span>Analyse Air Quality Data</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- LOCATION SELECTION PANEL -->
-      <section role="region" aria-labelledby="location-heading" class="glass-panel rounded-2xl p-6 sm:p-8 space-y-4 max-w-4xl mx-auto border border-slate-700/50">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
-          <div>
-            <h2 id="location-heading" class="text-lg font-bold text-white flex items-center space-x-2">
-              <i data-lucide="search" class="w-5 h-5 text-blue-400" aria-hidden="true"></i>
-              <span>Select Your Locality</span>
-            </h2>
-            <p class="text-xs text-slate-400">Choose a location to retrieve real atmospheric measurements and investigate local sources.</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <button id="btn-use-geolocation" onclick="requestBrowserGeolocation()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 transition-all flex items-center space-x-1.5" aria-label="Use browser geolocation to find current coordinates">
-              <i data-lucide="crosshair" class="w-3.5 h-3.5" aria-hidden="true"></i>
-              <span>Use Geolocation</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Search Bar with Label -->
-        <div>
-          <label for="locality-search-input" class="sr-only">Search locality, city, landmark</label>
-          <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-            <i data-lucide="map-pin" class="w-5 h-5 text-slate-400 mr-3" aria-hidden="true"></i>
-            <input type="text" id="locality-search-input" name="locality" placeholder="Search locality, city, landmark (e.g. Connaught Place, Anand Vihar, BKC Mumbai, Whitefield)..." class="bg-transparent w-full text-sm text-white placeholder-slate-500 focus:outline-none" onkeydown="if(event.key === 'Enter') handleSearchSubmit()">
-            <button onclick="handleSearchSubmit()" class="ml-2 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition-all" aria-label="Submit locality search">
-              Search
-            </button>
-          </div>
-        </div>
-
-        <!-- Quick Locality Chips -->
-        <div class="flex items-center flex-wrap gap-2 pt-1 text-xs text-slate-400" role="group" aria-label="Popular Indian Municipalities">
-          <span class="font-medium text-slate-500 flex items-center"><i data-lucide="sparkles" class="w-3 h-3 mr-1 text-amber-400" aria-hidden="true"></i> Popular:</span>
-          <button onclick="selectQuickLocation('Connaught Place, Central Delhi', 28.6315, 77.2167)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Connaught Place (Delhi)</button>
-          <button onclick="selectQuickLocation('Anand Vihar, East Delhi', 28.6508, 77.3152)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Anand Vihar (Delhi)</button>
-          <button onclick="selectQuickLocation('Bandra Kurla Complex (BKC), Mumbai', 19.0657, 72.8688)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">BKC (Mumbai)</button>
-          <button onclick="selectQuickLocation('Whitefield, Bengaluru', 12.9698, 77.7499)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Whitefield (Bengaluru)</button>
-          <button onclick="selectQuickLocation('Sanathnagar, Hyderabad', 17.4565, 78.4439)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Sanathnagar (Hyderabad)</button>
-        </div>
-
-        <!-- Geolocation Permission Dialog Note -->
-        <div id="geo-permission-banner" class="hidden bg-blue-950/40 border border-blue-800/50 rounded-xl p-3 text-xs text-blue-300 flex items-start justify-between" role="alert">
-          <div class="flex items-start space-x-2">
-            <i data-lucide="info" class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
-            <div>
-              <span class="font-semibold text-white">Browser Geolocation Permission:</span>
-              <p>NIRVAIR requires your explicit consent to retrieve coordinates via browser geolocation. Coordinates are processed locally and never stored without your permission.</p>
-            </div>
-          </div>
-          <button onclick="document.getElementById('geo-permission-banner').classList.add('hidden')" class="text-blue-400 hover:text-white ml-2" aria-label="Dismiss geolocation banner">✕</button>
-        </div>
-      </section>
-
-      <!-- SIGNATURE ONBOARDING: PERCEPTION VS REALITY -->
-      <section id="perception-section" role="region" aria-labelledby="perception-heading" class="max-w-4xl mx-auto space-y-6">
-        <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-700/50 space-y-6">
-          <div class="text-center max-w-xl mx-auto space-y-2">
-            <span class="text-xs uppercase font-extrabold tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">The Perception Test</span>
-            <h2 id="perception-heading" class="text-2xl sm:text-3xl font-bold text-white">What do you think the AQI around you is right now?</h2>
-            <p class="text-sm text-slate-400">Before looking at sensors, gauge the atmosphere. What is your intuitive perception?</p>
+      <!-- ========================================================== -->
+      <!-- SLIDE 1: HOOK                                              -->
+      <!-- ========================================================== -->
+      <section id="slide-0" class="slide" data-slide-index="0" aria-label="Step 1: Introduction">
+        <div class="slide-content">
+          <div class="pill-group">
+            <span class="pill-feature">🏛️ CPCB CAAQMS + Open-Meteo Telemetry</span>
+            <span class="pill-feature">🔬 Atmospheric Physics & Inversion</span>
+            <span class="pill-feature">🛡️ 4-Tier Data Trust Engine</span>
           </div>
 
-          <!-- Category Selector Buttons (Indian National AQI) with Radiogroup -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 pt-2" id="aqi-category-buttons" role="radiogroup" aria-label="Estimated AQI category">
-            <button onclick="selectPerceptionCategory('Good', 35)" role="radio" aria-checked="false" aria-label="Good, AQI 0 to 50" class="cat-btn p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/15 text-center transition group">
-              <span class="block text-xs font-bold text-emerald-400">Good</span>
-              <span class="block text-[11px] text-slate-400 font-mono mt-0.5">0 – 50</span>
+          <h1 class="headline-large">Do you really know what you're breathing?</h1>
+          
+          <p class="subheadline">
+            Most citizens and local administrators see air quality as an abstract, citywide number. 
+            <strong>NIRVAIR</strong> bridges the gap between perception and ground reality—transforming raw sensor feeds, 
+            meteorological physics, and civic memory into hyper-local truth, actionable interventions, and measurable outcomes.
+          </p>
+
+          <div style="margin-top: 1.5rem;">
+            <button type="button" class="cta-pill-btn" onclick="goToSlide(1)" aria-label="Start air quality check">
+              Let's Check →
             </button>
-            <button onclick="selectPerceptionCategory('Satisfactory', 75)" role="radio" aria-checked="false" aria-label="Satisfactory, AQI 51 to 100" class="cat-btn p-3 rounded-xl border border-lime-500/30 bg-lime-500/5 hover:bg-lime-500/15 text-center transition group">
-              <span class="block text-xs font-bold text-lime-400">Satisfactory</span>
-              <span class="block text-[11px] text-slate-400 font-mono mt-0.5">51 – 100</span>
-            </button>
-            <button onclick="selectPerceptionCategory('Moderate', 150)" role="radio" aria-checked="true" aria-label="Moderate, AQI 101 to 200" class="cat-btn p-3 rounded-xl border border-yellow-500/30 bg-yellow-500/15 ring-2 ring-yellow-500 text-center transition group">
-              <span class="block text-xs font-bold text-yellow-400">Moderate</span>
-              <span class="block text-[11px] text-slate-400 font-mono mt-0.5">101 – 200</span>
-            </button>
-            <button onclick="selectPerceptionCategory('Poor', 250)" role="radio" aria-checked="false" aria-label="Poor, AQI 201 to 300" class="cat-btn p-3 rounded-xl border border-orange-500/30 bg-orange-500/5 hover:bg-orange-500/15 text-center transition group">
-              <span class="block text-xs font-bold text-orange-400">Poor</span>
-              <span class="block text-[11px] text-slate-400 font-mono mt-0.5">201 – 300</span>
-            </button>
-            <button onclick="selectPerceptionCategory('Very Poor', 350)" role="radio" aria-checked="false" aria-label="Very Poor, AQI 301 to 400" class="cat-btn p-3 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-center transition group">
-              <span class="block text-xs font-bold text-red-400">Very Poor</span>
-              <span class="block text-[11px] text-slate-400 font-mono mt-0.5">301 – 400</span>
-            </button>
-            <button onclick="selectPerceptionCategory('Severe', 450)" role="radio" aria-checked="false" aria-label="Severe, AQI 401 to 500+" class="cat-btn p-3 rounded-xl border border-rose-900/40 bg-rose-900/10 hover:bg-rose-900/20 text-center transition group">
-              <span class="block text-xs font-bold text-rose-300">Severe</span>
-              <span class="block text-[11px] text-slate-400 font-mono mt-0.5">401 – 500+</span>
-            </button>
-          </div>
-
-          <!-- Slider / Specific Number Input -->
-          <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 space-y-3">
-            <div class="flex items-center justify-between text-xs">
-              <label for="perception-slider" class="text-slate-400">Fine-tune your AQI estimate:</label>
-              <span class="font-mono font-bold text-white bg-slate-800 px-2.5 py-1 rounded text-sm" id="perception-slider-val" aria-live="polite">150</span>
-            </div>
-            <input type="range" id="perception-slider" min="0" max="500" value="150" aria-valuemin="0" aria-valuemax="500" aria-valuenow="150" aria-valuetext="150, Moderate" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updatePerceptionSlider(this.value)">
-            <div class="flex justify-between text-[10px] text-slate-500 font-mono" aria-hidden="true">
-              <span>0 (Clean)</span>
-              <span>100 (Acceptable)</span>
-              <span>200 (Moderate)</span>
-              <span>300 (Poor)</span>
-              <span>400 (Hazardous)</span>
-              <span>500+</span>
-            </div>
-          </div>
-
-          <!-- Reveal Reality Button -->
-          <div class="text-center">
-            <button onclick="revealPerceptionVsReality()" id="btn-reveal-reality" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white font-extrabold text-base tracking-wide transition shadow-xl shadow-blue-500/25 flex items-center space-x-2 mx-auto" aria-label="Reveal perception versus reality comparison">
-              <i data-lucide="eye" class="w-5 h-5" aria-hidden="true"></i>
-              <span>REVEAL PERCEPTION vs REALITY</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- THE REVEAL RESULT CARD (DYNAMICALLY POPULATED & ANNOUNCED VIA ARIA-LIVE) -->
-        <div id="reveal-card-container" class="hidden" role="status" aria-live="polite">
-          <div class="glass-panel-elevated rounded-3xl p-6 sm:p-10 border border-slate-700 space-y-8 animate-fade-in">
-            <!-- Header Banner -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700/80 pb-6 gap-4">
-              <div>
-                <span class="text-xs uppercase font-extrabold tracking-wider text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">Official Ground Truth Comparison</span>
-                <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-2" id="reveal-locality-title">Connaught Place, Central Delhi</h3>
-                <p class="text-xs text-slate-400 mt-1 flex items-center">
-                  <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-slate-500" aria-hidden="true"></i>
-                  <span>Last Updated: <strong class="text-slate-200" id="reveal-timestamp">Just Now</strong></span>
-                </p>
-              </div>
-              <div id="reveal-delta-badge" class="px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-bold flex items-center space-x-2">
-                <i data-lucide="alert-triangle" class="w-4 h-4" aria-hidden="true"></i>
-                <span id="reveal-delta-text">Underestimated by 95 points</span>
-              </div>
-            </div>
-
-            <!-- Comparison Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Left: User Perception -->
-              <div class="bg-slate-900/80 rounded-2xl p-6 border border-slate-800 space-y-4">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Your Perception</span>
-                  <i data-lucide="user" class="w-5 h-5 text-slate-500" aria-hidden="true"></i>
-                </div>
-                <div class="flex items-baseline space-x-3">
-                  <span class="text-5xl font-black text-white font-mono" id="reveal-user-val">150</span>
-                  <span class="text-lg font-bold text-slate-300" id="reveal-user-cat">Moderate</span>
-                </div>
-                <p class="text-xs text-slate-400 leading-relaxed" id="reveal-user-desc">
-                  You perceived ambient air quality to be moderate with minor discomfort.
-                </p>
-              </div>
-
-              <!-- Right: Reported Reality -->
-              <div class="bg-slate-900/80 rounded-2xl p-6 border border-slate-700/80 space-y-4 relative overflow-hidden" id="reveal-reality-card">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold uppercase tracking-wider text-blue-400">Reported Reality</span>
-                  <span id="reveal-category-pill" class="aqi-pill bg-aqi-poor">POOR</span>
-                </div>
-                <div class="flex items-baseline space-x-3">
-                  <span class="text-5xl font-black text-white font-mono" id="reveal-actual-val">245</span>
-                  <span class="text-xs font-mono text-slate-400">CPCB NAQI</span>
-                </div>
-                <p class="text-xs text-slate-300 leading-relaxed" id="reveal-actual-desc">
-                  Breathing discomfort to most people on prolonged exposure.
-                </p>
-              </div>
-            </div>
-
-            <!-- Station Metadata & Hyperlocal Disclaimer Banner -->
-            <div class="bg-blue-950/30 border border-blue-800/40 rounded-2xl p-5 space-y-3">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 text-slate-300">
-                <div class="flex items-center space-x-2">
-                  <i data-lucide="radio" class="w-4 h-4 text-emerald-400 flex-shrink-0" aria-hidden="true"></i>
-                  <span>Monitoring Station: <strong class="text-white font-semibold" id="reveal-station-name">Mandir Marg CAAQMS (DPCC/CPCB)</strong></span>
-                </div>
-                <div class="flex items-center space-x-4">
-                  <span>Distance: <strong class="text-white font-semibold" id="reveal-station-dist">1.6 km away</strong></span>
-                  <span>Data Source: <strong class="text-slate-200">CAMS & Atmospheric Feed</strong></span>
-                </div>
-              </div>
-
-              <div class="border-t border-blue-900/50 pt-2.5 flex items-start space-x-2 text-xs text-amber-300/90 leading-relaxed">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
-                <p>
-                  <strong class="font-bold text-amber-300">Station-Level vs Hyperlocal Limitation:</strong>
-                  The nearest continuous regulatory station is <span id="reveal-station-dist-sub">1.6 km</span> away. Regulatory monitors gauge regional atmospheric airsheds. Hyperlocal air quality at your specific street corner or balcony will vary significantly based on adjacent vehicle flow, street canyon geometry, and open dust.
-                </p>
-              </div>
-            </div>
-
-            <!-- Pollutant Breakdown Grid -->
-            <div>
-              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
-                <i data-lucide="activity" class="w-3.5 h-3.5 mr-1.5 text-blue-400" aria-hidden="true"></i>
-                <span>Constituent Pollutant Profile</span>
-              </h4>
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="pollutant-cards-grid">
-                <!-- Dynamically populated with PM2.5, PM10, NO2, SO2, CO, O3 -->
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      <!-- NEIGHBOURHOOD INTELLIGENCE MAP -->
-      <section role="region" aria-labelledby="map-heading" class="max-w-6xl mx-auto space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-blue-500" aria-hidden="true"></span>
-              <h2 id="map-heading" class="text-2xl font-extrabold text-white">Neighbourhood Intelligence Map</h2>
-            </div>
-            <p class="text-sm text-slate-400 mt-1">
-              Investigating potential nearby sources contributing to local particulate and gaseous loading.
-            </p>
-          </div>
-          <button onclick="openCitizenReportModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 text-xs font-bold transition flex items-center space-x-1.5" aria-label="Open report form to log local pollution source">
-            <i data-lucide="flag" class="w-4 h-4" aria-hidden="true"></i>
-            <span>Report Local Source</span>
-          </button>
-        </div>
-
-        <!-- 4-Tier Source Classification Legend -->
-        <div class="flex flex-wrap items-center gap-2 text-xs" role="note" aria-label="Map classification legend">
-          <span class="text-slate-500 font-semibold text-[11px] uppercase mr-1">Classification:</span>
-          <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">● Verified Station</span>
-          <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">● Mapped Infrastructure</span>
-          <span class="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">● Citizen Observation</span>
-          <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">● AI-Generated Hypothesis</span>
-        </div>
-
-        <!-- Interactive Map Container with Accessible Text Fallback -->
-        <div class="glass-panel rounded-2xl p-3 border border-slate-700/60 overflow-hidden">
-          <div id="neighbourhood-map" role="application" aria-label="Interactive map displaying monitoring stations and nearby pollution sources. Full textual list of all mapped sources is provided directly below." class="w-full h-[450px] rounded-xl z-10"></div>
-        </div>
-
-        <!-- Nearby Source Cards Grid -->
-        <div class="space-y-3">
-          <div class="flex items-center justify-between text-xs text-slate-400">
-            <span class="font-bold text-white uppercase tracking-wider">Identified Local Sources & Hypotheses</span>
-            <span id="sources-count-badge" role="status" aria-live="polite">Scanning proximity...</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="neighbourhood-sources-grid">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-      </section>
-
-      <!-- PERSONALISED ACTION INTELLIGENCE -->
-      <section role="region" aria-labelledby="action-intel-heading" class="max-w-6xl mx-auto space-y-6 pt-4 border-t border-slate-800">
-        <div class="text-center max-w-2xl mx-auto space-y-2">
-          <span class="text-xs uppercase font-extrabold tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">AI Action Engine</span>
-          <h2 id="action-intel-heading" class="text-2xl sm:text-3xl font-extrabold text-white">Personalised Action Intelligence</h2>
-          <p class="text-sm text-slate-400">Select your role to receive tailored, verifiable interventions grounded in live AQI and local evidence.</p>
-        </div>
-
-        <!-- Role Selector Tabs -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl mx-auto" id="role-selector-tabs" role="tablist" aria-label="User Roles">
-          <button onclick="selectUserRole('citizen')" id="role-btn-citizen" role="tab" aria-selected="true" class="role-btn p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="user" class="w-5 h-5 text-blue-400" aria-hidden="true"></i>
-            <span>Citizen / Resident</span>
-          </button>
-          <button onclick="selectUserRole('school')" id="role-btn-school" role="tab" aria-selected="false" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="graduation-cap" class="w-5 h-5 text-emerald-400" aria-hidden="true"></i>
-            <span>School Admin</span>
-          </button>
-          <button onclick="selectUserRole('society')" id="role-btn-society" role="tab" aria-selected="false" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="building" class="w-5 h-5 text-amber-400" aria-hidden="true"></i>
-            <span>Housing Society (RWA)</span>
-          </button>
-          <button onclick="selectUserRole('ward_officer')" id="role-btn-ward_officer" role="tab" aria-selected="false" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="shield-check" class="w-5 h-5 text-purple-400" aria-hidden="true"></i>
-            <span>Ward Officer / Authority</span>
-          </button>
-        </div>
-
-        <!-- Role Strategic Overview -->
-        <div id="role-strategic-summary" role="status" aria-live="polite" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 max-w-3xl mx-auto flex items-start space-x-3">
-          <i data-lucide="sparkles" class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
-          <p id="role-summary-text">Generating tailored directives based on current air conditions...</p>
-        </div>
-
-        <!-- Actions Horizon Grid: Immediate, Short-Term, Long-Term -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="action-horizons-container">
-          <!-- Immediate Actions -->
-          <div class="space-y-4">
-            <div class="flex items-center space-x-2 border-b border-red-500/30 pb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-red-400" aria-hidden="true"></span>
-              <h3 class="text-sm font-extrabold uppercase tracking-wider text-red-300">Immediate Actions (Today)</h3>
-            </div>
-            <div class="space-y-3" id="actions-immediate-list">
-              <!-- Cards dynamically inserted -->
-            </div>
-          </div>
-
-          <!-- Short-Term Actions -->
-          <div class="space-y-4">
-            <div class="flex items-center space-x-2 border-b border-amber-500/30 pb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400" aria-hidden="true"></span>
-              <h3 class="text-sm font-extrabold uppercase tracking-wider text-amber-300">Short-Term (7–30 Days)</h3>
-            </div>
-            <div class="space-y-3" id="actions-shortterm-list">
-              <!-- Cards dynamically inserted -->
-            </div>
-          </div>
-
-          <!-- Long-Term Actions -->
-          <div class="space-y-4">
-            <div class="flex items-center space-x-2 border-b border-blue-500/30 pb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-blue-400" aria-hidden="true"></span>
-              <h3 class="text-sm font-extrabold uppercase tracking-wider text-blue-300">Long-Term (Structural)</h3>
-            </div>
-            <div class="space-y-3" id="actions-longterm-list">
-              <!-- Cards dynamically inserted -->
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- WORKFLOW B: PROFESSIONAL DATA ANALYSIS ENGINE                  -->
-    <!-- ============================================================== -->
-    <div id="section-workflow-b" role="tabpanel" aria-labelledby="tab-btn-workflow-b" class="hidden space-y-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
-        <div>
-          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <i data-lucide="database" class="w-3.5 h-3.5" aria-hidden="true"></i>
-            <span>Institutional Data Trust Engine</span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Analyse My Data</h2>
-          <p class="text-sm text-slate-400">Upload messy environmental sensor files, Excel sheets, or pasted tables for automated validation and trust auditing.</p>
-        </div>
-        <button onclick="loadSampleMessyData()" class="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto" aria-label="Load pre-built messy sample dataset to test data trust engine">
-          <i data-lucide="file-code" class="w-4 h-4" aria-hidden="true"></i>
-          <span>Load Sample Messy Dataset</span>
+      <!-- ========================================================== -->
+      <!-- SLIDE 2: PERSONA SELECTION                                 -->
+      <!-- ========================================================== -->
+      <section id="slide-1" class="slide" data-slide-index="1" inert aria-label="Step 2: Persona Selection">
+        <button type="button" class="back-btn" onclick="goToSlide(0)" aria-label="Go back to previous step">
+          ← Back
         </button>
-      </div>
 
-      <!-- Ingestion Card -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- File Drag & Drop Zone -->
-        <div class="glass-panel rounded-2xl p-6 border-2 border-dashed border-slate-700 hover:border-blue-500/60 transition flex flex-col items-center justify-center text-center space-y-3 cursor-pointer" onclick="document.getElementById('data-file-input').click()" onkeydown="if(event.key === 'Enter' || event.key === ' ') document.getElementById('data-file-input').click()" tabindex="0" role="button" aria-label="Upload CSV or Excel file">
-          <input type="file" id="data-file-input" class="hidden" accept=".csv, .xlsx, .xls, .tsv, .txt" onchange="handleFileUpload(event)">
-          <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-            <i data-lucide="upload-cloud" class="w-6 h-6" aria-hidden="true"></i>
-          </div>
-          <div>
-            <span class="text-sm font-bold text-white">Upload CSV or Excel File</span>
-            <p class="text-xs text-slate-400 mt-1">Supports messy headers, missing values, timestamps, and inconsistent units (up to 10MB).</p>
-          </div>
-          <span class="text-[11px] text-blue-400 font-mono">.csv, .xlsx, .xls, .tsv, .txt</span>
-        </div>
+        <div class="slide-content">
+          <h2 class="headline-medium">What describes you best?</h2>
+          <p class="subheadline">
+            Select your civic role. NIRVAIR tailors atmospheric interpretations, operational directives, 
+            and hyper-local action plans to your specific institutional mandate.
+          </p>
 
-        <!-- Raw Text Paste Box -->
-        <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 flex flex-col space-y-3">
-          <div class="flex items-center justify-between text-xs">
-            <label for="pasted-data-input" class="font-bold text-slate-300">Or Paste Tabular Text</label>
-            <span class="text-slate-500 font-mono text-[11px]">CSV / TSV / Delimited</span>
-          </div>
-          <textarea id="pasted-data-input" rows="4" placeholder="Date, PM2.5, Location&#10;2026-11-01 08:00, 45.2, Sector-4&#10;2026-11-01 09:00, -10.0, Sector-4&#10;2026-11-01 10:00, NA, Sector-4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"></textarea>
-          <button onclick="handlePastedDataSubmit()" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition" aria-label="Process and validate pasted tabular data">
-            Process Pasted Data
-          </button>
-        </div>
-      </div>
+          <div class="persona-grid" role="group" aria-label="Civic Persona Selection">
+            <!-- 1. Local Authority -->
+            <button type="button" class="persona-card" onclick="selectPersona('local_authority')" aria-label="Select persona: Local Authority (Municipal Commissioners & Pollution Control Boards)">
+              <div class="persona-icon-box" aria-hidden="true">🏛️</div>
+              <div class="persona-title">Local Authority</div>
+              <div class="persona-desc">Municipal Commissioners, Pollution Control Boards & Urban Development Authorities.</div>
+              <div class="persona-tag">Strategic Directives →</div>
+            </button>
 
-      <!-- Analysis Results View -->
-      <div id="data-analysis-results" role="status" aria-live="polite" class="hidden space-y-6">
-        <!-- 4-Tier Trust Metric Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div class="glass-panel rounded-xl p-4 border border-emerald-500/30 bg-emerald-500/5">
-            <div class="flex items-center justify-between text-xs text-emerald-400 font-bold uppercase">
-              <span>Reliable</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
-            </div>
-            <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-green">0</span>
-            <span class="text-[11px] text-slate-400">Passes all range and validity checks</span>
-          </div>
+            <!-- 2. Housing Society -->
+            <button type="button" class="persona-card" onclick="selectPersona('housing_society')" aria-label="Select persona: Housing Society (RWA Presidents & Facility Managers)">
+              <div class="persona-icon-box" aria-hidden="true">🏢</div>
+              <div class="persona-title">Housing Society</div>
+              <div class="persona-desc">RWA Presidents, Gated Community Committees & Estate Facility Managers.</div>
+              <div class="persona-tag">Premises Interventions →</div>
+            </button>
 
-          <div class="glass-panel rounded-xl p-4 border border-yellow-500/30 bg-yellow-500/5">
-            <div class="flex items-center justify-between text-xs text-yellow-400 font-bold uppercase">
-              <span>Suspicious</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-yellow-400" aria-hidden="true"></span>
-            </div>
-            <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-yellow">0</span>
-            <span class="text-[11px] text-slate-400">Sudden spike or frozen sensor output</span>
-          </div>
+            <!-- 3. Ward-Level Team -->
+            <button type="button" class="persona-card" onclick="selectPersona('ward_officer')" aria-label="Select persona: Ward-Level Team (Corporators & Field Sanitation Staff)">
+              <div class="persona-icon-box" aria-hidden="true">🛡️</div>
+              <div class="persona-title">Ward-Level Team</div>
+              <div class="persona-desc">Ward Corporators, Zonal Health Officers & Municipal Field Sanitation Teams.</div>
+              <div class="persona-tag">Enforcement Hotspots →</div>
+            </button>
 
-          <div class="glass-panel rounded-xl p-4 border border-red-500/30 bg-red-500/5">
-            <div class="flex items-center justify-between text-xs text-red-400 font-bold uppercase">
-              <span>Invalid</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-red-400" aria-hidden="true"></span>
-            </div>
-            <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-red">0</span>
-            <span class="text-[11px] text-slate-400">Negative or physically impossible value</span>
-          </div>
+            <!-- 4. Schools -->
+            <button type="button" class="persona-card" onclick="selectPersona('school')" aria-label="Select persona: Schools (Principals & Physical Education Directors)">
+              <div class="persona-icon-box" aria-hidden="true">🏫</div>
+              <div class="persona-title">Schools</div>
+              <div class="persona-desc">School Principals, Physical Education Directors & Childcare Administrators.</div>
+              <div class="persona-tag">Pediatric Health Rules →</div>
+            </button>
 
-          <div class="glass-panel rounded-xl p-4 border border-slate-600/30 bg-slate-800/20">
-            <div class="flex items-center justify-between text-xs text-slate-400 font-bold uppercase">
-              <span>Insufficient</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-slate-500" aria-hidden="true"></span>
-            </div>
-            <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-grey">0</span>
-            <span class="text-[11px] text-slate-400">Missing reading or unparseable text</span>
+            <!-- 5. Individual -->
+            <button type="button" class="persona-card" onclick="selectPersona('citizen')" aria-label="Select persona: Individual Trying to Bring a Change (Citizen Advocates & Residents)">
+              <div class="persona-icon-box" aria-hidden="true">🌱</div>
+              <div class="persona-title">Individual Trying to Bring a Change</div>
+              <div class="persona-desc">Neighborhood advocates, concerned parents & proactive civic champions.</div>
+              <div class="persona-tag">Community Action →</div>
+            </button>
           </div>
         </div>
+      </section>
 
-        <!-- Statistical Profile & Trend -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 lg:col-span-2 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 class="text-sm font-bold text-white flex items-center">
-                <i data-lucide="calculator" class="w-4 h-4 mr-2 text-blue-400" aria-hidden="true"></i>
-                <span>Deterministic Statistical Profile (<span id="stats-target-col">PM2.5</span>)</span>
-              </h3>
-              <span class="text-xs text-slate-400" id="stats-total-rows">0 records</span>
-            </div>
-            <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center">
-              <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <span class="text-[10px] uppercase font-bold text-slate-500">Mean</span>
-                <span class="text-lg font-bold font-mono text-white block mt-1" id="stat-mean">-</span>
-              </div>
-              <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <span class="text-[10px] uppercase font-bold text-slate-500">Median</span>
-                <span class="text-lg font-bold font-mono text-white block mt-1" id="stat-median">-</span>
-              </div>
-              <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <span class="text-[10px] uppercase font-bold text-slate-500">95th %ile</span>
-                <span class="text-lg font-bold font-mono text-white block mt-1" id="stat-p95">-</span>
-              </div>
-              <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <span class="text-[10px] uppercase font-bold text-slate-500">Min</span>
-                <span class="text-lg font-bold font-mono text-white block mt-1" id="stat-min">-</span>
-              </div>
-              <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <span class="text-[10px] uppercase font-bold text-slate-500">Max</span>
-                <span class="text-lg font-bold font-mono text-white block mt-1" id="stat-max">-</span>
-              </div>
-              <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-                <span class="text-[10px] uppercase font-bold text-slate-500">Std Dev</span>
-                <span class="text-lg font-bold font-mono text-white block mt-1" id="stat-stddev">-</span>
-              </div>
-            </div>
+      <!-- ========================================================== -->
+      <!-- SLIDE 3: LOGIN GATEWAY                                     -->
+      <!-- ========================================================== -->
+      <section id="slide-2" class="slide" data-slide-index="2" inert aria-label="Step 3: Evaluator Login">
+        <button type="button" class="back-btn" onclick="goToSlide(1)" aria-label="Go back to previous step">
+          ← Back
+        </button>
 
-            <!-- Trend Callout -->
-            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-              <div class="flex items-center space-x-2">
-                <i data-lucide="trending-up" class="w-4 h-4 text-purple-400" aria-hidden="true"></i>
-                <span>Longitudinal Trend: <strong class="text-white" id="stat-trend-direction">Stable</strong></span>
-              </div>
-              <span class="font-mono text-slate-400" id="stat-trend-change">0% shift</span>
-            </div>
-          </div>
-
-          <!-- Gemini AI Dataset Assessment Card -->
-          <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center space-x-2">
-                <i data-lucide="cpu" class="w-4 h-4 text-emerald-400" aria-hidden="true"></i>
-                <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Gemini AI Audit</span>
-              </div>
-              <h4 class="text-sm font-bold text-white">Data Integrity Rating: <span id="ai-integrity-rating" class="text-emerald-400">High</span></h4>
-              <p class="text-xs text-slate-300 leading-relaxed" id="ai-summary-text">
-                Analyzing dataset consistency...
+        <div class="slide-content">
+          <!-- Main Login Card with #login-gateway-overlay preserved for backward test compatibility -->
+          <div id="login-gateway-overlay" class="login-card card-white-elevated">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <h2 id="login-title" class="headline-medium" style="font-size: 1.5rem;">PromptWars Evaluator Gateway</h2>
+              <p class="subheadline" style="font-size: 0.875rem; margin-bottom: 1rem;">
+                Authenticate with hackathon evaluator credentials or click Auto-Fill to proceed.
               </p>
             </div>
-            <div class="text-[11px] text-slate-400 border-t border-slate-800 pt-3">
-              <strong class="text-slate-200">Recommendation:</strong>
-              <p id="ai-rec-text" class="mt-0.5">Recalibrate zero-point drift on sensors showing negative offset.</p>
+
+            <!-- Demo Credentials Quick-Fill Card -->
+            <div class="demo-credentials-box">
+              <div class="demo-credentials-header">
+                <span style="font-weight: 700; font-size: 0.8125rem; color: var(--google-blue);">
+                  Demo Evaluator Credentials
+                </span>
+                <button type="button" class="demo-fill-btn" onclick="quickFillCredentials()" aria-label="Auto-fill demo credentials ID PromtWars and password google">
+                  Auto-Fill
+                </button>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                <div>User ID: <strong style="color: var(--text-primary);">PromtWars</strong></div>
+                <div>Password: <strong style="color: var(--text-primary);">google</strong></div>
+              </div>
+            </div>
+
+            <form id="gateway-login-form" onsubmit="handleLoginSubmit(event)" style="display: flex; flex-direction: column; gap: 1.25rem;">
+              <div id="login-error-alert" style="display: none; padding: 0.75rem; border-radius: 8px; background: #FCE8E6; color: #C5221F; font-size: 0.8125rem;" role="alert" aria-live="assertive"></div>
+
+              <div>
+                <label for="login-username" class="form-label">User ID</label>
+                <input type="text" id="login-username" name="username" value="PromtWars" required autocomplete="username" class="form-input" aria-label="Evaluator User ID" placeholder="PromtWars">
+              </div>
+
+              <div>
+                <label for="login-password" class="form-label">Password</label>
+                <input type="password" id="login-password" name="password" value="google" required autocomplete="current-password" class="form-input" aria-label="Evaluator Password" placeholder="••••••••">
+              </div>
+
+              <button type="submit" id="login-submit-btn" class="btn-primary" aria-label="Authenticate and proceed to data ingestion">
+                Continue →
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- SLIDE 4: LOCALITY + DATA INGESTION & REALITY CHECK         -->
+      <!-- ========================================================== -->
+      <section id="slide-3" class="slide" data-slide-index="3" inert aria-label="Step 4: Locality & Data Telemetry">
+        <button type="button" class="back-btn" onclick="goToSlide(2)" aria-label="Go back to previous step">
+          ← Back
+        </button>
+
+        <div class="slide-content">
+          <h2 class="headline-medium">Locality Telemetry & Data Ingestion</h2>
+          <p class="subheadline">
+            Enter your target locality, upload or paste raw sensor datasets, and verify citizen perceptions against live ground telemetry.
+          </p>
+
+          <div class="card-white" style="max-width: 760px; width: 100%;">
+            <!-- 1. Locality Input & Quick Pills -->
+            <div style="margin-bottom: 1.5rem;">
+              <label for="locality-search-input" class="form-label">Locality / City Name</label>
+              <input type="text" id="locality-search-input" name="locality" value="MP Nagar, Bhopal" class="form-input" aria-label="Enter locality, neighborhood, or city name" placeholder="e.g. MP Nagar, Bhopal or Anand Vihar, Delhi">
+              
+              <div class="locality-pills" role="group" aria-label="Preset Localities">
+                <button type="button" class="locality-pill" onclick="setLocality('MP Nagar, Bhopal')" aria-label="Select MP Nagar, Bhopal">MP Nagar, Bhopal</button>
+                <button type="button" class="locality-pill" onclick="setLocality('Anand Vihar, Delhi')" aria-label="Select Anand Vihar, Delhi">Anand Vihar, Delhi</button>
+                <button type="button" class="locality-pill" onclick="setLocality('BKC, Mumbai')" aria-label="Select BKC, Mumbai">BKC, Mumbai</button>
+                <button type="button" class="locality-pill" onclick="setLocality('Whitefield, Bengaluru')" aria-label="Select Whitefield, Bengaluru">Whitefield, Bengaluru</button>
+              </div>
+            </div>
+
+            <!-- 2. Data Ingestion Options -->
+            <div style="border-top: 1px solid var(--hairline-border); padding-top: 1.25rem; margin-bottom: 1.5rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span class="form-label" style="margin-bottom: 0;">Upload or Paste Sensor Dataset</span>
+                <button type="button" id="load-messy-sample-btn" class="demo-fill-btn" onclick="loadMessySampleData()" aria-label="Load sample messy multi-unit CSV dataset">
+                  ⚡ Load Messy Sample
+                </button>
+              </div>
+
+              <div class="ingestion-grid">
+                <div>
+                  <label for="file-upload-input" class="form-label" style="font-size: 0.75rem; color: var(--text-secondary);">Upload File (.csv, .xlsx, .json)</label>
+                  <input type="file" id="file-upload-input" accept=".csv,.xlsx,.json" class="form-input" style="padding: 0.45rem;" aria-label="Upload CSV, Excel, or JSON air quality dataset">
+                </div>
+                <div>
+                  <label for="raw-paste-textarea" class="form-label" style="font-size: 0.75rem; color: var(--text-secondary);">Or Paste Raw Sensor Readings</label>
+                  <textarea id="raw-paste-textarea" rows="3" class="raw-textarea" aria-label="Paste raw CSV, TSV, or JSON sensor readings" placeholder="Timestamp;PM2.5;PM10;CO;NO2..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Secondary Perception Slider -->
+            <div class="perception-box">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <label for="perception-slider" class="form-label" style="margin-bottom: 0;">Or test citizen perception (0–500 AQI guess):</label>
+                <span id="perception-display-badge" style="font-weight: 800; font-size: 0.875rem; color: var(--google-blue);">250 AQI (Poor)</span>
+              </div>
+              <input type="range" id="perception-slider" min="0" max="500" value="250" style="width: 100%; accent-color: var(--google-blue);" aria-label="Estimate current AQI from 0 to 500" oninput="updatePerceptionSlider(this.value)">
+            </div>
+
+            <!-- Input Mode Radiogroup (For Accessibility Compliance) -->
+            <div role="radiogroup" aria-label="Ingestion Source Mode" class="sr-only">
+              <input type="radio" id="mode-auto" name="ingestion-mode" value="auto" checked role="radio" aria-label="Automated Live Sensor Mode">
+              <input type="radio" id="mode-custom" name="ingestion-mode" value="custom" role="radio" aria-label="Custom Dataset Mode">
+            </div>
+
+            <!-- Verification Trigger Button -->
+            <button type="button" id="run-check-btn" class="btn-primary" onclick="runDataAndRealityCheck()" aria-label="Run Data Audit & Reality Check">
+              🔬 Run Data Audit & Reality Check
+            </button>
+
+            <!-- Verification Gate Container (Adequacy Gate + Reality Badge) -->
+            <div id="verification-gate-container" style="margin-top: 1rem;" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================== -->
+      <!-- SLIDE 5: INTELLIGENCE BRIEFING & DUAL OUTPUTS              -->
+      <!-- ========================================================== -->
+      <section id="slide-4" class="slide" data-slide-index="4" inert aria-label="Step 5: Intelligence Briefing">
+        <button type="button" class="back-btn" onclick="goToSlide(3)" aria-label="Go back to previous step">
+          ← Back
+        </button>
+
+        <div class="slide-content">
+          <h2 class="headline-medium">Civic Intelligence & Ground-Truth Briefing</h2>
+          <p class="subheadline">
+            AI-synthesized operational analysis grounded in atmospheric physics, real-time telemetry, and historical civic memory.
+          </p>
+
+          <div class="briefing-grid">
+            <!-- 1. What Changed (Delta Summary) -->
+            <div class="card-white">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">📊 What Changed (Delta Summary)</span>
+                <span id="briefing-delta-pill" class="evaluator-badge" style="background: #E8F0FE; color: var(--google-blue);">Compared to Baseline</span>
+              </div>
+              <div id="briefing-delta-content" class="delta-summary-box">
+                <div style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+                  <strong>Baseline Memory:</strong> 260 AQI (Poor) recorded at regional CAAQMS.<br>
+                  <strong>Current Observation:</strong> <span id="delta-live-aqi">184 AQI (Moderate)</span>.<br>
+                  <strong>Observed Delta:</strong> <span id="delta-points-drop" style="color: var(--verified-green); font-weight: 700;">-76 points (29.2% improvement)</span>.
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Grounded Real-World Causes (Physics + Landmarks) -->
+            <div class="card-white">
+              <div style="margin-bottom: 0.75rem;">
+                <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">🌪️ Grounded Atmospheric & Urban Drivers</span>
+              </div>
+              <div id="briefing-physics-content" style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;">
+                <div>• <strong>Wind Dispersion:</strong> 4.8 km/h (Moderate boundary layer stagnation).</div>
+                <div>• <strong>PM2.5 / PM10 Ratio:</strong> 0.58 (Balanced combustion vs. road silt resuspension).</div>
+                <div>• <strong>Thermal Inversion Risk:</strong> Elevated during 06:00 AM – 09:00 AM.</div>
+              </div>
+              
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;">Nearby Ground Infrastructure (OSM):</div>
+              <div id="briefing-landmarks-list">
+                <div class="landmark-item">
+                  <span>Major Arterial Transit Corridor</span>
+                  <span style="color: var(--text-secondary); font-weight: 600;">450m</span>
+                </div>
+                <div class="landmark-item">
+                  <span>Active Commercial Construction Zone</span>
+                  <span style="color: var(--text-secondary); font-weight: 600;">620m</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spatial Map & Interactive Landmark Application -->
+            <div class="briefing-col-span-2">
+              <div id="spatial-telemetry-map" role="application" aria-label="Interactive Leaflet spatial telemetry map showing CAAQMS stations and neighborhood hotspots" style="border: 1px solid var(--hairline-border); border-radius: 12px; height: 180px; width: 100%; background: #F8F9FA; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 0.8125rem;">
+                🗺️ Spatial Telemetry Layer: CPCB Station Mandir Marg (2.8km) • Active Microclimate Grid
+              </div>
+            </div>
+
+            <!-- 3. Traceable Data Audit Drawer (Collapsible) -->
+            <div class="briefing-col-span-2">
+              <details class="audit-drawer" id="audit-log-drawer">
+                <summary aria-label="Toggle Data Audit Findings">
+                  🔍 Traceable Data Audit Drawer (<span id="audit-flag-count">4 Data Integrity Actions</span>)
+                </summary>
+                <div id="audit-citations-container" style="margin-top: 0.75rem;">
+                  <div class="audit-log-citation" onclick="highlightAuditRow(3)" role="button" tabindex="0" aria-label="View citation Row 3 Missing Reading">
+                    <strong>[Row 3 • Sensor PM2.5]</strong> Missing observation 'NA' flagged as <span style="color: #5F6368; font-weight: 700;">GREY (Insufficient Data)</span>. Excluded from arithmetic averaging.
+                  </div>
+                  <div class="audit-log-citation" onclick="highlightAuditRow(4)" role="button" tabindex="0" aria-label="View citation Row 4 Extreme Outlier">
+                    <strong>[Row 4 • Sensor PM2.5]</strong> Spike of 999.9 µg/m³ flagged as <span style="color: #D93025; font-weight: 700;">RED (Extreme Outlier)</span>. Sensor anomaly isolated.
+                  </div>
+                  <div class="audit-log-citation" onclick="highlightAuditRow(6)" role="button" tabindex="0" aria-label="View citation Row 6 Sensor Freezing">
+                    <strong>[Row 6 • Sensor PM10]</strong> Repeated constant reading flagged as <span style="color: #B06000; font-weight: 700;">YELLOW (Sensor Freezing)</span>.
+                  </div>
+                  <div class="audit-log-citation" role="button" tabindex="0" aria-label="View Unit Conversion Citation">
+                    <strong>[Unit Normalization]</strong> CO converted from 2.4 ppm to 2.75 mg/m³; NO2 converted from 54 ppb to 101.5 µg/m³ (CPCB Standard).
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- 4. Dual Briefing Artifacts (Internal Memo & Citizen Advisory) -->
+            <div class="briefing-col-span-2 card-white">
+              <!-- Tab Navigation -->
+              <div class="tab-list" role="tablist" aria-label="Briefing Output Formats">
+                <button type="button" role="tab" id="tab-internal-btn" class="tab-btn active" aria-selected="true" onclick="switchBriefingTab('internal')" aria-label="Show Internal Briefing Note">
+                  📑 Internal Briefing Note (Operational Memo)
+                </button>
+                <button type="button" role="tab" id="tab-citizen-btn" class="tab-btn" aria-selected="false" onclick="switchBriefingTab('citizen')" aria-label="Show Citizen Public Advisory">
+                  📢 Citizen Public Advisory
+                </button>
+              </div>
+
+              <!-- Tab Panel 1: Internal Briefing Note -->
+              <div id="panel-internal-briefing" role="tabpanel" aria-labelledby="tab-internal-btn">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <span style="font-weight: 700; font-size: 0.875rem; color: var(--text-primary);">Operational Directives</span>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);">CONFIDENTIAL • FOR MUNICIPAL LEADERSHIP</span>
+                </div>
+                <div id="internal-briefing-body" style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; background: #FAFAFA; border: 1px solid var(--hairline-border); border-radius: 8px; padding: 1rem;">
+EXECUTIVE SUMMARY:
+Local monitoring stations indicate Moderate particulate conditions (AQI: 184, Prominent: PM2.5). 
+Atmospheric inversion cap expected between 06:00 and 09:00 AM, inhibiting surface dispersion.
+
+HOTSPOT ANALYSIS:
+Transit corridor and unpaved arterial road shoulders within 500m generate 62% of local coarse dust load. 
+Commercial building site at 620m exhibits deficient perimeter fogging suppression.
+
+IMMEDIATE DIRECTIVES:
+1. Dispatch mechanized wet sweeper unit to arterial loop between 05:30 AM and 08:30 AM.
+2. Issue municipal environmental compliance notice to commercial construction site.
+                </div>
+              </div>
+
+              <!-- Tab Panel 2: Citizen Advisory -->
+              <div id="panel-citizen-advisory" role="tabpanel" aria-labelledby="tab-citizen-btn" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button type="button" id="lang-toggle-btn" class="demo-fill-btn" onclick="toggleLanguage()" aria-label="Switch advisory language">
+                      Language: English (Switch to हिंदी)
+                    </button>
+                    <button type="button" id="reading-level-btn" class="demo-fill-btn" onclick="toggleReadingLevel()" aria-label="Switch between simple and detailed advisory">
+                      Level: Simple (Switch to Detailed)
+                    </button>
+                  </div>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);">PUBLIC HEALTH RELEASE</span>
+                </div>
+
+                <!-- 3 Dedicated Vulnerable Group Alert Boxes -->
+                <div class="vulnerable-alerts-grid">
+                  <div class="vulnerable-alert-box alert-children">
+                    <strong>👶 Children:</strong><br>
+                    Reschedule vigorous morning sports and outdoor recess to late morning (after 10:30 AM).
+                  </div>
+                  <div class="vulnerable-alert-box alert-seniors">
+                    <strong>👴 Older Adults:</strong><br>
+                    Postpone early morning walks. Avoid exercising along heavy traffic corridors.
+                  </div>
+                  <div class="vulnerable-alert-box alert-sensitive">
+                    <strong>🫁 Sensitive Groups:</strong><br>
+                    Keep rescue inhalers accessible. Wear N95 masks if commuting during morning rush hours.
+                  </div>
+                </div>
+
+                <div id="citizen-advisory-body" style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; background: #FAFAFA; border: 1px solid var(--hairline-border); border-radius: 8px; padding: 1rem;">
+Today's air quality is Moderate. While healthy adults can go about normal outdoor activities, 
+children and seniors should avoid vigorous exercise before 9:30 AM due to morning smog trapping. 
+Keep windows closed during early morning rush hours.
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Flagged Observations Audit Trail -->
-        <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white flex items-center">
-              <i data-lucide="shield-alert" class="w-4 h-4 mr-2 text-amber-400" aria-hidden="true"></i>
-              <span>Audit Trail: Flagged & Suspicious Observations</span>
-            </h3>
-            <span class="text-xs text-slate-400" id="flagged-count-label">0 flagged items</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse" aria-label="Flagged observations audit table">
-              <thead>
-                <tr class="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
-                  <th scope="col" class="py-2.5 px-3">Row #</th>
-                  <th scope="col" class="py-2.5 px-3">Column</th>
-                  <th scope="col" class="py-2.5 px-3">Original Value</th>
-                  <th scope="col" class="py-2.5 px-3">Classification</th>
-                  <th scope="col" class="py-2.5 px-3">Diagnostic Rationale</th>
-                  <th scope="col" class="py-2.5 px-3">Calculation Status</th>
-                </tr>
-              </thead>
-              <tbody id="flagged-table-body" class="divide-y divide-slate-800/60 font-mono">
-                <!-- Rows dynamically injected -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- WORKFLOW C: INTERVENTION TRACKING & HISTORICAL MEMORY          -->
-    <!-- ============================================================== -->
-    <div id="section-workflow-c" role="tabpanel" aria-labelledby="tab-btn-workflow-c" class="hidden space-y-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
-        <div>
-          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <i data-lucide="clock" class="w-3.5 h-3.5" aria-hidden="true"></i>
-            <span>Persistent Civic Memory</span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Intervention Tracking & Longitudinal Memory</h2>
-          <p class="text-sm text-slate-400">Track accountability, deadlines, and evaluate whether civic actions made a measurable difference over time.</p>
-        </div>
-        <button onclick="evaluateInterventionComparison()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto shadow-lg shadow-purple-600/30" aria-label="Evaluate longitudinal intervention impact">
-          <i data-lucide="git-compare" class="w-4 h-4" aria-hidden="true"></i>
-          <span>Evaluate Intervention Impact</span>
-        </button>
-      </div>
-
-      <!-- Historical Comparison Modal / Result Card -->
-      <div id="intervention-comparison-card" role="status" aria-live="polite" class="hidden glass-panel-elevated rounded-2xl p-6 sm:p-8 border border-purple-500/40 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-4 gap-2">
-          <div>
-            <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Before vs After Civic Comparison</span>
-            <h3 class="text-xl font-bold text-white mt-1" id="cmp-locality">Anand Vihar, Delhi</h3>
-          </div>
-          <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" id="cmp-outcome-badge">Condition Improved</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">Baseline Period</span>
-            <span class="text-2xl font-bold text-white font-mono mt-1 block" id="cmp-baseline-aqi">260 AQI</span>
-            <span class="text-[11px] text-slate-500" id="cmp-baseline-date">7 days ago</span>
-          </div>
-          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">Current Observation</span>
-            <span class="text-2xl font-bold text-white font-mono mt-1 block" id="cmp-current-aqi">225 AQI</span>
-            <span class="text-[11px] text-slate-500">Today</span>
-          </div>
-          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">Delta</span>
-            <span class="text-2xl font-bold text-emerald-400 font-mono mt-1 block" id="cmp-delta-aqi">-35 AQI</span>
-            <span class="text-[11px] text-slate-400">1 Completed Intervention</span>
-          </div>
-        </div>
-
-        <!-- Strict Scientific Guardrail: Correlation vs Causation -->
-        <div class="bg-amber-950/30 border border-amber-800/40 rounded-xl p-4 text-xs text-amber-200 space-y-2">
-          <div class="flex items-center space-x-2 text-amber-400 font-bold uppercase tracking-wider text-[11px]">
-            <i data-lucide="shield-alert" class="w-4 h-4" aria-hidden="true"></i>
-            <span>Scientific Attribution Guardrail: Correlation ≠ Causation</span>
-          </div>
-          <p id="cmp-attribution-notice" class="leading-relaxed">
-            While AQI decreased alongside the completion of wet misting interventions, this reflects a temporal correlation. Atmospheric boundary layer dispersion, seasonal wind velocity, and ambient regional airshed conditions cannot be scientifically separated without calibrated meteorological modeling.
-          </p>
-        </div>
-      </div>
-
-      <!-- Interventions List -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between text-xs text-slate-400">
-          <span class="font-bold text-white uppercase tracking-wider">Active Civic Commitments</span>
-          <div class="flex items-center space-x-2">
-            <label for="filter-intv-status" class="sr-only">Filter interventions by status</label>
-            <select id="filter-intv-status" onchange="renderInterventionsList()" class="bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded px-2.5 py-1">
-              <option value="all">All Statuses</option>
-              <option value="proposed">Proposed</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="interventions-list-grid">
-          <!-- Dynamically populated -->
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- WORKFLOW D: CIVIC REPORTS GENERATION                           -->
-    <!-- ============================================================== -->
-    <div id="section-workflow-d" role="tabpanel" aria-labelledby="tab-btn-workflow-d" class="hidden space-y-8">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
-        <div>
-          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <i data-lucide="file-text" class="w-3.5 h-3.5" aria-hidden="true"></i>
-            <span>Civic Communication</span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Civic & Public Health Reports</h2>
-          <p class="text-sm text-slate-400">Generate executive municipal briefings or multilingual citizen advisories tailored for public protection.</p>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center space-x-1.5" aria-label="Print or export report to PDF">
-            <i data-lucide="printer" class="w-4 h-4" aria-hidden="true"></i>
-            <span>Export / Print</span>
+          <button type="button" class="btn-primary" style="max-width: 320px;" onclick="goToSlide(5)" aria-label="Proceed to hyper-local action plan">
+            Next: Hyper-Local Actions →
           </button>
         </div>
-      </div>
+      </section>
 
-      <!-- Report Generation Controls -->
-      <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label for="report-type-select" class="block text-xs font-bold text-slate-300 mb-1.5">Select Report Type</label>
-            <select id="report-type-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" onchange="handleReportTypeChange()">
-              <option value="briefing">Internal Civic Briefing (Municipal / Environmental)</option>
-              <option value="advisory">Citizen Advisory (General Public Health)</option>
-            </select>
-          </div>
-
-          <div id="report-lang-container" class="hidden">
-            <label for="report-lang-select" class="block text-xs font-bold text-slate-300 mb-1.5">Language</label>
-            <select id="report-lang-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-              <option value="en">English</option>
-              <option value="hi">हिंदी (Hindi)</option>
-            </select>
-          </div>
-
-          <div id="report-level-container" class="hidden">
-            <label for="report-level-select" class="block text-xs font-bold text-slate-300 mb-1.5">Reading Level</label>
-            <select id="report-level-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-              <option value="standard">Standard (Balanced clarity)</option>
-              <option value="simple">Simple (Plain everyday words)</option>
-              <option value="technical">Technical (Epidemiological & Particulates)</option>
-            </select>
-          </div>
-        </div>
-
-        <button onclick="generateReport()" id="btn-generate-report" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs transition flex items-center justify-center space-x-2" aria-label="Generate civic briefing or citizen advisory with Gemini API">
-          <i data-lucide="sparkles" class="w-4 h-4" aria-hidden="true"></i>
-          <span>Generate Report with Gemini</span>
+      <!-- ========================================================== -->
+      <!-- SLIDE 6: HYPER-LOCAL ACTION PLAN                           -->
+      <!-- ========================================================== -->
+      <section id="slide-5" class="slide" data-slide-index="5" inert aria-label="Step 6: Hyper-Local Actions">
+        <button type="button" class="back-btn" onclick="goToSlide(4)" aria-label="Go back to previous step">
+          ← Back
         </button>
-      </div>
 
-      <!-- Generated Report Display Area with Dynamic Language Tag -->
-      <div id="report-output-card" role="status" aria-live="polite" class="glass-panel-elevated rounded-2xl p-8 border border-slate-700 space-y-4 print-only-container">
-        <div class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed" id="report-markdown-content" lang="en">
-          <p class="text-slate-400 italic">Click "Generate Report with Gemini" to produce the civic briefing or public advisory.</p>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ============================================================== -->
-  <!-- CITIZEN REPORT SUBMISSION MODAL (ACCESSIBLE DIALOG)            -->
-  <!-- ============================================================== -->
-  <div id="citizen-report-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="cr-modal-title" onkeydown="handleModalKeyDown(event)">
-    <div class="glass-panel-elevated rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4" role="document">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="cr-modal-title" class="text-base font-bold text-white flex items-center">
-          <i data-lucide="flag" class="w-4 h-4 mr-2 text-amber-400" aria-hidden="true"></i>
-          <span>Report Local Pollution Source</span>
-        </h3>
-        <button onclick="closeCitizenReportModal()" class="text-slate-400 hover:text-white p-1 rounded-md" aria-label="Close report modal">✕</button>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label for="cr-locality" class="block font-semibold text-slate-300 mb-1">Locality / Landmark</label>
-          <input type="text" id="cr-locality" name="locality" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" value="Current Selected Locality">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label for="cr-type" class="block font-semibold text-slate-300 mb-1">Source Category</label>
-            <select id="cr-type" name="report_type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="waste_burning">Open Waste Burning</option>
-              <option value="construction_dust">Visible Construction Dust</option>
-              <option value="road_dust">Unpaved Road / Heavy Dust</option>
-              <option value="industrial_smoke">Industrial Stack Emission</option>
-              <option value="other">Other Activity</option>
-            </select>
+        <div class="slide-content">
+          <div id="action-persona-indicator" class="evaluator-badge" style="margin-bottom: 0.75rem;">
+            Role: Local Authority
           </div>
-          <div>
-            <label for="cr-severity" class="block font-semibold text-slate-300 mb-1">Observed Severity</label>
-            <select id="cr-severity" name="severity" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="low">Low (Minor visible haze)</option>
-              <option value="moderate" selected>Moderate (Distinct plume)</option>
-              <option value="high">High (Heavy dense smoke/dust)</option>
-              <option value="severe">Severe (Acute breathing irritation)</option>
-            </select>
+
+          <h2 class="headline-medium">Hyper-Local Action Plan</h2>
+          <p class="subheadline">
+            Three concrete, non-generic interventions tailored to your civic mandate, naming real nearby infrastructure and optimal meteorological execution windows.
+          </p>
+
+          <div class="actions-list" id="actions-container">
+            <!-- Step 1: Immediate Action -->
+            <div class="action-card">
+              <span class="action-phase-badge">Phase 1 • Immediate (Next 24 Hours)</span>
+              <div class="action-title" id="action-1-title">Deploy Anti-Smog Gun Along Transit Corridor Loop</div>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.5rem 0;" id="action-1-desc">
+                Target unpaved berms and diesel transit terminal entrance. Water misting suppresses silt resuspension before inversion layer breaks.
+              </p>
+              <div class="action-meta-grid">
+                <div>📍 <strong>Target Infrastructure:</strong> <span id="action-1-landmark">Arterial Bus Terminal & Ring Road</span></div>
+                <div>⏰ <strong>Execution Window:</strong> <span id="action-1-time">06:00 AM – 09:00 AM (Inversion Cap)</span></div>
+                <div>📉 <strong>Expected Impact:</strong> <span style="color: var(--verified-green); font-weight: 700;">-22 µg/m³ PM10</span></div>
+                <div>👤 <strong>Lead Stakeholder:</strong> Zonal Sanitation Supervisor</div>
+              </div>
+            </div>
+
+            <!-- Step 2: Short-Term Action -->
+            <div class="action-card">
+              <span class="action-phase-badge">Phase 2 • Short-Term (1 – 7 Days)</span>
+              <div class="action-title" id="action-2-title">Enforce Dust Barrier Curtains at Commercial Construction Site</div>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.5rem 0;" id="action-2-desc">
+                Mandate green geo-textile perimeter fencing and wheel-washing bays for heavy aggregate trucks exiting onto public asphalt.
+              </p>
+              <div class="action-meta-grid">
+                <div>📍 <strong>Target Infrastructure:</strong> <span id="action-2-landmark">Commercial Hub Site (620m away)</span></div>
+                <div>⏰ <strong>Execution Window:</strong> <span id="action-2-time">Continuous Monitoring (Daily Inspection)</span></div>
+                <div>📉 <strong>Expected Impact:</strong> <span style="color: var(--verified-green); font-weight: 700;">-18 µg/m³ PM2.5</span></div>
+                <div>👤 <strong>Lead Stakeholder:</strong> Building Regulation Inspector</div>
+              </div>
+            </div>
+
+            <!-- Step 3: Medium/Structural Action -->
+            <div class="action-card">
+              <span class="action-phase-badge">Phase 3 • Medium-Term (1 – 4 Weeks)</span>
+              <div class="action-title" id="action-3-title">Pave Unsealed Shoulders & Vegetative Bio-Filtering</div>
+              <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.5rem 0;" id="action-3-desc">
+                Install interlocking concrete pavers on bare road edges and plant dense native hedge buffers to trap road silt permanently.
+              </p>
+              <div class="action-meta-grid">
+                <div>📍 <strong>Target Infrastructure:</strong> <span id="action-3-landmark">Connecting Road Berms (1.2km stretch)</span></div>
+                <div>⏰ <strong>Execution Window:</strong> <span id="action-3-time">Off-Peak Night Work (10:00 PM – 05:00 AM)</span></div>
+                <div>📉 <strong>Expected Impact:</strong> <span style="color: var(--verified-green); font-weight: 700;">-35 µg/m³ PM10 (Long-term)</span></div>
+                <div>👤 <strong>Lead Stakeholder:</strong> Municipal Public Works Division</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="action-footer-buttons">
+            <button type="button" id="copy-whatsapp-btn" class="btn-secondary" onclick="copyWhatsAppAdvisory()" aria-label="Copy formatted citizen advisory for WhatsApp">
+              📱 Copy WhatsApp Advisory
+            </button>
+            <button type="button" id="print-memo-btn" class="btn-secondary" onclick="printBriefingMemo()" aria-label="Print executive briefing memo">
+              🖨️ Print Memo
+            </button>
+            <button type="button" id="start-new-check-btn" class="cta-pill-btn" onclick="resetAndStartNew()" aria-label="Start a new air quality audit">
+              🔄 Start New Check
+            </button>
           </div>
         </div>
+      </section>
 
-        <div>
-          <label for="cr-desc" class="block font-semibold text-slate-300 mb-1">Description & Evidence</label>
-          <textarea id="cr-desc" name="description" rows="3" placeholder="Provide specific details: e.g. smoldering trash heap near vacant plot, uncurtained sand excavation..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
-        <button onclick="closeCitizenReportModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Cancel</button>
-        <button onclick="submitCitizenReport()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">Submit Report</button>
-      </div>
-    </div>
+    </main>
   </div>
 
   <!-- ============================================================== -->
-  <!-- FOOTER                                                         -->
+  <!-- ACCESSIBLE CITIZEN INCIDENT REPORT MODAL (WCAG 2.2 AA)        -->
   <!-- ============================================================== -->
-  <footer role="contentinfo" class="border-t border-slate-800/80 bg-slate-950/60 py-6 text-xs text-slate-500 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center space-x-2">
-        <span class="font-extrabold text-slate-300">NIRVAIR</span>
-        <span>•</span>
-        <span>Built for Google for Developers PromptWars Hackathon</span>
-      </div>
-      <div class="flex items-center space-x-4 text-[11px]">
-        <span>Central Pollution Control Board (CPCB) NAQI Standard</span>
-        <span>•</span>
-        <span>Open-Meteo & Copernicus Atmospheric Service</span>
-      </div>
+  <dialog id="citizen-report-dialog" style="border: 1px solid var(--hairline-border); border-radius: 16px; padding: 2rem; max-width: 480px; width: 90%; background: #FFFFFF; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" aria-labelledby="cr-dialog-title">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 id="cr-dialog-title" style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin: 0;">Report Local Civic Incident</h3>
+      <button type="button" onclick="closeCitizenReportModal()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-secondary);" aria-label="Close incident reporting dialog">✕</button>
     </div>
-  </footer>
 
-  <!-- Main Client Application Logic -->
+    <form id="citizen-report-form" onsubmit="submitCitizenIncident(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+      <div>
+        <label for="cr-locality" class="form-label">Locality / Landmark</label>
+        <input type="text" id="cr-locality" name="locality" required class="form-input" aria-label="Enter incident locality" placeholder="e.g. Near Anand Vihar Terminal">
+      </div>
+
+      <div>
+        <label for="cr-type" class="form-label">Incident Type</label>
+        <select id="cr-type" name="report_type" required class="form-input" aria-label="Select incident type">
+          <option value="waste_burning">Open Municipal Waste / Leaf Burning</option>
+          <option value="construction_dust">Uncovered Construction / Silt Dust</option>
+          <option value="industrial_smoke">Industrial Plume / Factory Smoke</option>
+          <option value="diesel_generator">Diesel Generator Idling</option>
+          <option value="heavy_traffic_congestion">Severe Traffic Gridlock</option>
+          <option value="other">Other Environmental Issue</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="cr-desc" class="form-label">Incident Description</label>
+        <textarea id="cr-desc" name="description" rows="3" required class="form-input" aria-label="Describe the environmental incident" placeholder="Describe smoke density, odor, or active machinery..."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.5rem;">
+        <button type="button" onclick="closeCitizenReportModal()" class="btn-secondary" aria-label="Cancel incident reporting">Cancel</button>
+        <button type="submit" class="btn-primary" style="width: auto;" aria-label="Submit verified incident report">Submit Incident Report</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Toast Notification Container (WCAG aria-live="polite") -->
+  <div id="toast-notification" role="status" aria-live="polite"></div>
+
+  <!-- Main Application Logic Script -->
   <script src="/app.js"></script>
+  <script>
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  </script>
 </body>
 </html>

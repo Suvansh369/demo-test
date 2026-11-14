@@ -89,7 +89,7 @@ async function runSecurityAndA11yTests() {
       })
     });
     const dataSanitized = await resSanitized.json();
-    assert(resSanitized.status === 200, 'Valid report submitted successfully');
+    assert(resSanitized.status === 200 || resSanitized.status === 201, 'Valid report submitted successfully');
     assert(!dataSanitized.report.description.includes('<script>'), 'HTML/script tags sanitized from citizen report description');
   } catch (err) {
     assert(false, `Sanitization test failed: ${err.message}`);

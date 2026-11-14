@@ -1,6 +1,7 @@
 /**
  * NIRVAIR Input Validation & Sanitization Middleware.
  * Strictly validates geographical bounds, numerical parameters, enums, and sanitizes strings.
+ * Dual-interface: functions as Express middleware OR as a direct validator function.
  */
 
 const VALID_REPORT_TYPES = ['waste_burning', 'construction_dust', 'road_dust', 'industrial_smoke', 'other'];
@@ -41,67 +42,97 @@ function sanitizeString(str, maxLength = 500) {
 
 /**
  * Validates Citizen Report submission payload
+ * Dual-mode: supports validateCitizenReport(req, res, next) AND validateCitizenReport(data)
  */
-function validateCitizenReport(req, res, next) {
-  const { latitude, longitude, report_type, severity, description, locality } = req.body;
+function validateCitizenReport(dataOrReq, res, next) {
+  const isMiddleware = res && typeof next === 'function';
+  const body = isMiddleware ? (dataOrReq.body || {}) : (dataOrReq || {});
+
+  const errors = [];
+  const { latitude, longitude, report_type, severity, description, locality } = body;
 
   if (!isValidCoordinate(latitude, longitude)) {
-    return res.status(400).json({
-      success: false,
-      error: 'Invalid coordinates. Latitude must be between -90 and 90, Longitude between -180 and 180.'
-    });
+    errors.push('Invalid coordinates. Latitude must be between -90 and 90, Longitude between -180 and 180.');
   }
 
   if (!report_type || !VALID_REPORT_TYPES.includes(report_type)) {
-    return res.status(400).json({
-      success: false,
-      error: `Invalid report_type. Allowed types: ${VALID_REPORT_TYPES.join(', ')}`
-    });
+    errors.push(`Invalid report_type. Allowed types: ${VALID_REPORT_TYPES.join(', ')}`);
   }
 
   if (severity && !VALID_SEVERITIES.includes(severity)) {
-    return res.status(400).json({
-      success: false,
-      error: `Invalid severity level. Allowed values: ${VALID_SEVERITIES.join(', ')}`
-    });
+    errors.push(`Invalid severity level. Allowed values: ${VALID_SEVERITIES.join(', ')}`);
   }
 
-  // Sanitize fields
-  req.body.locality = sanitizeString(locality || 'Current Locality', 150);
-  req.body.description = sanitizeString(description || '', 1000);
-  req.body.severity = severity || 'moderate';
+  const sanitized = {
+    latitude: Number(latitude),
+    longitude: Number(longitude),
+    report_type: report_type || 'other',
+    severity: severity || 'moderate',
+    locality: sanitizeString(locality || 'Current Locality', 150),
+    description: sanitizeString(description || '', 1000)
+  };
 
-  next();
+  if (isMiddleware) {
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, error: errors[0], errors });
+    }
+    dataOrReq.body = sanitized;
+    return next();
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    sanitized
+  };
 }
 
 /**
  * Validates Intervention submission payload
+ * Dual-mode: supports validateIntervention(req, res, next) AND validateIntervention(data)
  */
-function validateIntervention(req, res, next) {
-  const { role, title, timeframe, status } = req.body;
+function validateIntervention(dataOrReq, res, next) {
+  const isMiddleware = res && typeof next === 'function';
+  const body = isMiddleware ? (dataOrReq.body || {}) : (dataOrReq || {});
+
+  const errors = [];
+  const { role, title, timeframe, status, locality, rationale, evidence, assigned_to, deadline, notes, verification_method } = body;
 
   if (role && !VALID_ROLES.includes(role)) {
-    return res.status(400).json({
-      success: false,
-      error: `Invalid role. Allowed roles: ${VALID_ROLES.join(', ')}`
-    });
+    errors.push(`Invalid role. Allowed roles: ${VALID_ROLES.join(', ')}`);
   }
 
   if (status && !VALID_INTERVENTION_STATUSES.includes(status)) {
-    return res.status(400).json({
-      success: false,
-      error: `Invalid status. Allowed statuses: ${VALID_INTERVENTION_STATUSES.join(', ')}`
-    });
+    errors.push(`Invalid status. Allowed statuses: ${VALID_INTERVENTION_STATUSES.join(', ')}`);
   }
 
-  if (title) req.body.title = sanitizeString(title, 200);
-  if (req.body.rationale) req.body.rationale = sanitizeString(req.body.rationale, 1000);
-  if (req.body.evidence) req.body.evidence = sanitizeString(req.body.evidence, 1000);
-  if (req.body.assigned_to) req.body.assigned_to = sanitizeString(req.body.assigned_to, 150);
-  if (req.body.notes) req.body.notes = sanitizeString(req.body.notes, 1000);
-  if (req.body.verification_method) req.body.verification_method = sanitizeString(req.body.verification_method, 500);
+  const sanitized = {
+    role: role || 'citizen',
+    title: sanitizeString(title || 'Untitled Intervention', 200),
+    timeframe: timeframe || 'immediate',
+    status: status || 'proposed',
+    locality: sanitizeString(locality || 'Locality', 150),
+    rationale: sanitizeString(rationale || '', 1000),
+    evidence: sanitizeString(evidence || '', 1000),
+    assigned_to: sanitizeString(assigned_to || 'Unassigned', 150),
+    deadline: deadline || new Date(Date.now() + 86400000 * 7).toISOString().slice(0, 10),
+    notes: sanitizeString(notes || '', 1000),
+    verification_method: sanitizeString(verification_method || '', 500)
+  };
 
-  next();
+  if (isMiddleware) {
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, error: errors[0], errors });
+    }
+    dataOrReq.body = sanitized;
+    return next();
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    sanitized
+  };
 }
 
 module.exports = {

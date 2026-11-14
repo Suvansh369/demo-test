@@ -204,7 +204,7 @@ async function runHackathonEvaluation() {
   // Test 10: Historical Comparison & Causation Guardrail
   // -------------------------------------------------------------
   try {
-    db.recordAQISnapshot({
+    await db.recordAQISnapshot({
       locality: 'Delhi Cantt',
       latitude: 28.58,
       longitude: 77.12,
@@ -215,7 +215,7 @@ async function runHackathonEvaluation() {
       station_name: 'Mandir Marg CAAQMS',
       station_distance_km: 4.2
     });
-    const hist = db.getAQIHistory('Delhi Cantt');
+    const hist = await db.getAQIHistory('Delhi Cantt');
     if (!hist || hist.length === 0) throw new Error('Could not retrieve historical snapshot.');
 
     recordPass(10, 'Historical Comparison & Memory', `Logged and retrieved historical AQI observation with station metadata and verified delta evaluation.`);
@@ -227,7 +227,7 @@ async function runHackathonEvaluation() {
   // Test 11: Intervention Creation, Updating & Verification
   // -------------------------------------------------------------
   try {
-    const item = db.addIntervention({
+    const item = await db.addIntervention({
       locality: 'Koramangala, Bengaluru',
       role: 'housing_society',
       title: 'Pave unsealed boundary road berms',
@@ -237,7 +237,7 @@ async function runHackathonEvaluation() {
       assigned_to: 'Estate Manager',
       status: 'proposed'
     });
-    const updated = db.updateIntervention(item.id, { status: 'completed', notes: 'Completed paver installation.' });
+    const updated = await db.updateIntervention(item.id, { status: 'completed', notes: 'Completed paver installation.' });
     if (updated.status !== 'completed' || !updated.completed_at) {
       throw new Error('Intervention status update did not record completion timestamp.');
     }

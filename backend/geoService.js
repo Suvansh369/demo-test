@@ -56,7 +56,10 @@ async function geocodeLocation(query) {
 
     for (const term of searchTerms) {
       const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=5&language=en&format=json`;
-      const res = await fetch(url, { headers: { 'User-Agent': 'NIRVAIR-Civic-Platform/1.0' } });
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'NIRVAIR-Civic-Platform/1.0' },
+        signal: AbortSignal.timeout(10000)
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.results && data.results.length > 0) {
@@ -146,7 +149,7 @@ async function getNeighbourhoodSources(lat, lon, localityName) {
   }
 
   // 2. Query citizen reports in the vicinity
-  const reports = db.getCitizenReports();
+  const reports = await db.getCitizenReports();
   for (const rep of reports) {
     const distKm = calculateDistanceKm(lat, lon, rep.latitude, rep.longitude);
     if (distKm <= 10.0) {

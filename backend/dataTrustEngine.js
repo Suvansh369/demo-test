@@ -287,8 +287,10 @@ function calculateStatistics(values = []) {
 
 /**
  * Full Pipeline for Data Trust Engine
+ * Optimized with asynchronous chunked batch evaluation (Promise.all)
+ * to process large datasets efficiently without blocking the event loop.
  */
-function processAirQualityDataset(rawRows, fileName = 'uploaded_data.csv') {
+async function processAirQualityDataset(rawRows, fileName = 'uploaded_data.csv', chunkSize = 250) {
   if (!rawRows || !Array.isArray(rawRows) || rawRows.length === 0) {
     throw new Error('Dataset is empty or contains no parseable records.');
   }
@@ -324,57 +326,91 @@ function processAirQualityDataset(rawRows, fileName = 'uploaded_data.csv') {
     targetParam = 'aqi';
   }
 
-  const evaluatedRows = [];
-  const validValues = [];
-  const flaggedObservations = [];
+  // Partition rows into concurrent chunks
+  const chunks = [];
+  for (let i = 0; i < rowsToProcess.length; i += chunkSize) {
+    chunks.push({
+      startIdx: i,
+      rows: rowsToProcess.slice(i, i + chunkSize)
+    });
+  }
+
   const seenFingerprints = new Set();
   let duplicateCount = 0;
 
-  let prevNumeric = null;
+  // Process chunks in parallel using Promise.all
+  const chunkResults = await Promise.all(chunks.map(async (chunk) => {
+    // Yield briefly to event loop
+    await new Promise(resolve => setImmediate(resolve));
 
-  for (let idx = 0; idx < rowsToProcess.length; idx++) {
-    const raw = rowsToProcess[idx];
+    const chunkEvaluatedRows = [];
+    const chunkValidValues = [];
+    const chunkFlaggedObs = [];
 
-    const fingerprint = JSON.stringify(raw);
-    let isDuplicate = false;
-    if (seenFingerprints.has(fingerprint)) {
-      duplicateCount++;
-      isDuplicate = true;
-    } else {
-      seenFingerprints.add(fingerprint);
-    }
+    let prevNumeric = null;
 
-    const rawVal = raw[targetCol];
-    const evalResult = evaluateObservation(targetParam, rawVal, prevNumeric);
+    for (let cIdx = 0; cIdx < chunk.rows.length; cIdx++) {
+      const globalIdx = chunk.startIdx + cIdx;
+      const raw = chunk.rows[cIdx];
 
-    if (!evalResult.excludedFromCalculations && evalResult.value !== null) {
-      validValues.push(evalResult.value);
-      prevNumeric = evalResult.value;
-    }
+      const fingerprint = JSON.stringify(raw);
+      let isDuplicate = false;
+      if (seenFingerprints.has(fingerprint)) {
+        duplicateCount++;
+        isDuplicate = true;
+      } else {
+        seenFingerprints.add(fingerprint);
+      }
 
-    if (evalResult.flag !== 'GREEN' || isDuplicate) {
-      flaggedObservations.push({
-        rowIndex: idx + 1,
-        column: targetCol,
+      const rawVal = raw[targetCol];
+      const evalResult = evaluateObservation(targetParam, rawVal, prevNumeric);
+
+      if (!evalResult.excludedFromCalculations && evalResult.value !== null) {
+        chunkValidValues.push(evalResult.value);
+        prevNumeric = evalResult.value;
+      }
+
+      if (evalResult.flag !== 'GREEN' || isDuplicate) {
+        chunkFlaggedObs.push({
+          rowIndex: globalIdx + 1,
+          column: targetCol,
+          parameter: targetParam,
+          originalValue: rawVal,
+          flag: isDuplicate && evalResult.flag === 'GREEN' ? 'YELLOW' : evalResult.flag,
+          status: isDuplicate && evalResult.flag === 'GREEN' ? 'Duplicate Record' : evalResult.status,
+          reason: isDuplicate ? 'Identical record repeated; potential duplicate sensor transmission.' : evalResult.reason,
+          excludedFromCalculations: evalResult.excludedFromCalculations,
+          requiresManualVerification: evalResult.requiresManualVerification || isDuplicate
+        });
+      }
+
+      chunkEvaluatedRows.push({
+        rowIndex: globalIdx + 1,
+        originalData: raw,
+        targetColumn: targetCol,
         parameter: targetParam,
-        originalValue: rawVal,
-        flag: isDuplicate && evalResult.flag === 'GREEN' ? 'YELLOW' : evalResult.flag,
-        status: isDuplicate && evalResult.flag === 'GREEN' ? 'Duplicate Record' : evalResult.status,
-        reason: isDuplicate ? 'Identical record repeated; potential duplicate sensor transmission.' : evalResult.reason,
-        excludedFromCalculations: evalResult.excludedFromCalculations,
-        requiresManualVerification: evalResult.requiresManualVerification || isDuplicate
+        trustFlag: isDuplicate && evalResult.flag === 'GREEN' ? 'YELLOW' : evalResult.flag,
+        evalResult,
+        isDuplicate
       });
     }
 
-    evaluatedRows.push({
-      rowIndex: idx + 1,
-      originalData: raw,
-      targetColumn: targetCol,
-      parameter: targetParam,
-      trustFlag: isDuplicate && evalResult.flag === 'GREEN' ? 'YELLOW' : evalResult.flag,
-      evalResult,
-      isDuplicate
-    });
+    return {
+      evaluatedRows: chunkEvaluatedRows,
+      validValues: chunkValidValues,
+      flaggedObservations: chunkFlaggedObs
+    };
+  }));
+
+  // Consolidate chunked results
+  const evaluatedRows = [];
+  const validValues = [];
+  const flaggedObservations = [];
+
+  for (const cr of chunkResults) {
+    evaluatedRows.push(...cr.evaluatedRows);
+    validValues.push(...cr.validValues);
+    flaggedObservations.push(...cr.flaggedObservations);
   }
 
   const stats = calculateStatistics(validValues);

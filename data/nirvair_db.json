@@ -1,0 +1,243 @@
+{
+  "citizen_reports": [
+    {
+      "id": "cr-5f9f98dc",
+      "latitude": 28.65,
+      "longitude": 77.31,
+      "locality": "Anand Vihar ISBT",
+      "report_type": "waste_burning",
+      "severity": "high",
+      "description": "E2E automated test: open garbage burning observed.",
+      "timestamp": "2026-11-14T05:44:56.187Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-f9b3c5e2",
+      "latitude": 28.65,
+      "longitude": 77.31,
+      "locality": "Anand Vihar ISBT",
+      "report_type": "waste_burning",
+      "severity": "high",
+      "description": "E2E automated test: open garbage burning observed.",
+      "timestamp": "2026-11-14T05:43:42.700Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-ac29e645",
+      "latitude": 28.63,
+      "longitude": 77.21,
+      "locality": "Connaught Place",
+      "report_type": "construction_dust",
+      "severity": "moderate",
+      "description": "Unit test report",
+      "timestamp": "2026-11-14T05:37:45.026Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-9a10a30d",
+      "latitude": 28.63,
+      "longitude": 77.21,
+      "locality": "Connaught Place",
+      "report_type": "construction_dust",
+      "severity": "moderate",
+      "description": "Unit test report",
+      "timestamp": "2026-11-14T05:36:56.798Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-init-1",
+      "latitude": 28.636,
+      "longitude": 77.201,
+      "locality": "Connaught Place / Mandir Marg, Delhi",
+      "report_type": "construction_dust",
+      "severity": "moderate",
+      "description": "Uncovered aggregate dumping and heavy dust from commercial renovation near inner circle.",
+      "timestamp": "2026-11-14T01:36:56.679Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-init-2",
+      "latitude": 28.6508,
+      "longitude": 77.3152,
+      "locality": "Anand Vihar ISBT, Delhi",
+      "report_type": "waste_burning",
+      "severity": "high",
+      "description": "Smoldering dry leaves and municipal refuse burning along drainage embankment.",
+      "timestamp": "2026-11-13T11:36:56.690Z",
+      "status": "verified"
+    }
+  ],
+  "interventions": [
+    {
+      "id": "int-849ae7d2",
+      "locality": "Koramangala, Bengaluru",
+      "role": "housing_society",
+      "title": "Pave unsealed boundary road berms",
+      "timeframe": "short_term",
+      "rationale": "Suppresses dry silt resuspension",
+      "evidence": "High PM10 readings",
+      "assigned_to": "Estate Manager",
+      "deadline": "2026-11-21",
+      "status": "completed",
+      "notes": "Completed paver installation.",
+      "verification_method": "",
+      "created_at": "2026-11-14T05:47:24.094Z",
+      "completed_at": "2026-11-14T05:47:24.095Z"
+    },
+    {
+      "id": "int-8b277a37",
+      "locality": "Koramangala, Bengaluru",
+      "role": "housing_society",
+      "title": "Pave unsealed boundary road berms",
+      "timeframe": "short_term",
+      "rationale": "Suppresses dry silt resuspension",
+      "evidence": "High PM10 readings",
+      "assigned_to": "Estate Manager",
+      "deadline": "2026-11-21",
+      "status": "completed",
+      "notes": "Completed paver installation.",
+      "verification_method": "",
+      "created_at": "2026-11-14T05:45:48.534Z",
+      "completed_at": "2026-11-14T05:45:48.536Z"
+    },
+    {
+      "id": "int-99e396c8",
+      "locality": "Anand Vihar",
+      "role": "ward_officer",
+      "title": "E2E Mechanical Wet Sweeper Deployment",
+      "timeframe": "immediate",
+      "rationale": "Elevated roadside dust",
+      "evidence": "PM10 spike recorded",
+      "assigned_to": "Sanitation PWD",
+      "deadline": "2026-11-20",
+      "status": "completed",
+      "notes": "",
+      "verification_method": "GPS truck tracking logs",
+      "created_at": "2026-11-14T05:44:57.884Z",
+      "completed_at": "2026-11-14T05:44:57.884Z"
+    },
+    {
+      "id": "int-init-1",
+      "locality": "Anand Vihar, Delhi",
+      "role": "ward_officer",
+      "title": "Deploy Anti-Smog Gun & Wet Sweeping",
+      "timeframe": "immediate",
+      "rationale": "Elevated PM10 readings due to heavy unpaved shoulder dust and bus movement.",
+      "evidence": "PM10 concentration 280 ug/m3; Anand Vihar CAAQMS shows Poor category.",
+      "assigned_to": "Sanitation Division East, MCD",
+      "deadline": "2026-11-16",
+      "status": "in_progress",
+      "notes": "Water misting truck scheduled for twice-daily runs between 7 AM and 3 PM.",
+      "verification_method": "GPS track logs from water tanker and hourly CAAQMS PM10 trend comparison.",
+      "created_at": "2026-11-12T05:36:56.690Z",
+      "completed_at": null
+    },
+    {
+      "id": "int-init-2",
+      "locality": "Vasant Vihar, Delhi",
+      "role": "school",
+      "title": "Shift Morning Physical Assembly to Indoor Auditorium",
+      "timeframe": "immediate",
+      "rationale": "AQI exceeding 220 (Poor) during morning inversion peak (7:30 - 9:00 AM).",
+      "evidence": "Morning particulate peak recorded at 245 AQI; health advisory for pediatric respiratory protection.",
+      "assigned_to": "Vice Principal & Sports Director",
+      "deadline": "2026-11-14",
+      "status": "completed",
+      "notes": "Indoor air purifiers operating in gym and auditorium; sports sessions postponed to post-noon.",
+      "verification_method": "Daily log verified by school administration; parent notification dispatched.",
+      "created_at": "2026-11-10T05:36:56.690Z",
+      "completed_at": "2026-11-13T05:36:56.690Z"
+    }
+  ],
+  "aqi_history": [
+    {
+      "id": "snap-acf57ed8",
+      "locality": "Selected Location (28.6315, 77.2167)",
+      "latitude": 28.6315,
+      "longitude": 77.2167,
+      "aqi": 158,
+      "category": "Moderate",
+      "pm25": 77.8,
+      "pm10": 100.6,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 1.6,
+      "recorded_at": "2026-11-14T05:49:31.072Z"
+    },
+    {
+      "id": "snap-eca20bd2",
+      "locality": "Delhi Cantt",
+      "latitude": 28.58,
+      "longitude": 77.12,
+      "aqi": 275,
+      "category": "Poor",
+      "pm25": 115,
+      "pm10": 230,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 4.2,
+      "recorded_at": "2026-11-14T05:47:24.090Z"
+    },
+    {
+      "id": "snap-a4965b75",
+      "locality": "Delhi Cantt",
+      "latitude": 28.58,
+      "longitude": 77.12,
+      "aqi": 275,
+      "category": "Poor",
+      "pm25": 115,
+      "pm10": 230,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 4.2,
+      "recorded_at": "2026-11-14T05:45:48.530Z"
+    },
+    {
+      "id": "snap-4e14ccc6",
+      "locality": "Anand Vihar, East Delhi",
+      "latitude": 28.6508,
+      "longitude": 77.3152,
+      "aqi": 158,
+      "category": "Moderate",
+      "pm25": 77.8,
+      "pm10": 100.6,
+      "station_name": "Anand Vihar CAAQMS",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T05:44:56.127Z"
+    },
+    {
+      "id": "snap-54530145",
+      "locality": "Anand Vihar, East Delhi",
+      "latitude": 28.6508,
+      "longitude": 77.3152,
+      "aqi": 158,
+      "category": "Moderate",
+      "pm25": 77.8,
+      "pm10": 100.6,
+      "station_name": "Anand Vihar CAAQMS",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T05:43:42.613Z"
+    },
+    {
+      "id": "hist-delhi-baseline",
+      "locality": "Central Delhi",
+      "latitude": 28.6139,
+      "longitude": 77.209,
+      "aqi": 260,
+      "category": "Poor",
+      "pm25": 110,
+      "pm10": 220,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 2.8,
+      "recorded_at": "2026-11-07T05:36:56.690Z"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "ds-1794635097877",
+      "filename": "messy_e2e.csv",
+      "uploaded_at": "2026-11-14T05:44:57.877Z",
+      "row_count": 8,
+      "valid_count": 2,
+      "flagged_count": 6,
+      "summary_json": "{\"count\":6,\"mean\":777.92,\"median\":340,\"p95\":1950,\"min\":42.5,\"max\":1950,\"stdDev\":917.51}"
+    }
+  ]
+}

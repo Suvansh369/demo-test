@@ -225,23 +225,31 @@ textarea:focus-visible,
   flex-wrap: nowrap;
   transition: transform 650ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
+  z-index: 1;
 }
 
-/* Panoramic SVG curved roadmap spanning 600vw */
+/* Panoramic SVG curved roadmap spanning 600vw — OUTSIDE slides-track */
 .panoramic-roadmap-wrapper {
   position: absolute;
   top: 0;
   left: 0;
   width: 600vw;
   height: 100vh;
-  pointer-events: none;
-  z-index: 1;
+  pointer-events: none !important;
+  z-index: 0;
+  user-select: none;
+  touch-action: none;
+}
+
+.panoramic-roadmap-wrapper * {
+  pointer-events: none !important;
 }
 
 .panoramic-roadmap-svg {
   width: 600vw;
   height: 100vh;
   display: block;
+  pointer-events: none !important;
 }
 
 .roadmap-milestone {
@@ -267,11 +275,11 @@ textarea:focus-visible,
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  pointer-events: auto;
 }
 
 .slide[inert] {
-  pointer-events: none !important;
-  user-select: none !important;
+  user-select: none;
 }
 
 .slide-inner {
@@ -403,7 +411,10 @@ textarea:focus-visible,
   border: 1px solid var(--hairline-border);
   border-radius: 16px;
   padding: 1.5rem;
-  cursor: pointer;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
   transition: all 200ms ease;
   box-shadow: 0 1px 3px rgba(60,64,67,0.06);
 }

@@ -36,6 +36,27 @@ const state = {
 // Milestone path fractions for the 6 panoramic focal points
 const MILESTONE_FRACTIONS = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0];
 
+// Safe Storage Helpers (Brave Shields / Privacy Mode Proof)
+function safeSessionSet(key, val) {
+  try {
+    sessionStorage.setItem(key, val);
+  } catch (e) {
+    console.warn('Storage write skipped (private mode / shields):', key);
+  }
+}
+function safeSessionGet(key) {
+  try {
+    return sessionStorage.getItem(key);
+  } catch (e) {
+    return null;
+  }
+}
+function safeSessionRemove(key) {
+  try {
+    sessionStorage.removeItem(key);
+  } catch (e) {}
+}
+
 // ================================================================
 // 2. IMMEDIATE GLOBAL WINDOW EXPORTS (FAIL-SAFE BINDINGS)
 // ================================================================
@@ -66,14 +87,23 @@ window.submitCitizenIncident = submitCitizenIncident;
 // 3. LIFECYCLE & INITIALIZATION
 // ================================================================
 function initApp() {
-  initPanoramicRoadmap();
-  checkSessionAuth();
-  updateInertSlideStates();
-  attachButtonListeners();
-
-  window.addEventListener('resize', () => {
+  try {
+    if (window.location.hash) {
+      try {
+        window.history.replaceState(null, '', window.location.pathname);
+      } catch (e) {}
+    }
     initPanoramicRoadmap();
-  });
+    checkSessionAuth();
+    updateInertSlideStates();
+    attachButtonListeners();
+
+    window.addEventListener('resize', () => {
+      try { initPanoramicRoadmap(); } catch (e) {}
+    });
+  } catch (err) {
+    console.warn('initApp error:', err);
+  }
 }
 
 if (document.readyState === 'loading') {
@@ -88,12 +118,18 @@ if (document.readyState === 'loading') {
 function attachButtonListeners() {
   const heroBtn = document.getElementById('hero-start-btn');
   if (heroBtn) {
-    heroBtn.addEventListener('click', () => goToSlide(1));
+    heroBtn.addEventListener('click', (e) => {
+      if (e) e.preventDefault();
+      goToSlide(1);
+    });
   }
 
   const backBtn = document.getElementById('global-back-btn');
   if (backBtn) {
-    backBtn.addEventListener('click', () => prevSlide());
+    backBtn.addEventListener('click', (e) => {
+      if (e) e.preventDefault();
+      prevSlide();
+    });
   }
 }
 
@@ -102,11 +138,13 @@ function attachButtonListeners() {
  * measures total path length and aligns milestone rings.
  */
 function initPanoramicRoadmap() {
-  const path = document.getElementById('panoramic-progress-path');
-  if (!path) return;
-
   try {
+    const path = document.getElementById('panoramic-progress-path');
+    if (!path || typeof path.getTotalLength !== 'function') return;
+
     const totalLength = path.getTotalLength();
+    if (!totalLength || isNaN(totalLength)) return;
+
     path.style.strokeDasharray = `${totalLength} ${totalLength}`;
     
     // Position the 6 milestone rings along the curve
@@ -126,58 +164,18 @@ function initPanoramicRoadmap() {
 }
 
 function snapDotToSlide(slideIndex, totalLen) {
-  const path = document.getElementById('panoramic-progress-path');
-  const dotCore = document.getElementById('dot-core');
-  const dotHalo = document.getElementById('dot-halo');
-  if (!path || !dotCore || !dotHalo) return;
+  try {
+    const path = document.getElementById('panoramic-progress-path');
+    const dotCore = document.getElementById('dot-core');
+    const dotHalo = document.getElementById('dot-halo');
+    if (!path || !dotCore || !dotHalo || typeof path.getTotalLength !== 'function') return;
 
-  const totalLength = totalLen || path.getTotalLength();
-  const frac = MILESTONE_FRACTIONS[slideIndex] || (slideIndex / 5);
-  const currentDist = frac * totalLength;
-  
-  path.style.strokeDashoffset = `${totalLength - currentDist}`;
+    const totalLength = totalLen || path.getTotalLength();
+    if (!totalLength || isNaN(totalLength)) return;
 
-  const pt = path.getPointAtLength(currentDist);
-  dotCore.setAttribute('cx', pt.x);
-  dotCore.setAttribute('cy', pt.y);
-  dotHalo.setAttribute('cx', pt.x);
-  dotHalo.setAttribute('cy', pt.y);
-
-  updateMilestoneVisuals(slideIndex);
-}
-
-// ================================================================
-// 4. ANIMATED TRAVELING DOT & PROGRESS TRAIL (650ms RAF)
-// ================================================================
-function animateDotTransition(fromIndex, toIndex) {
-  const path = document.getElementById('panoramic-progress-path');
-  const dotCore = document.getElementById('dot-core');
-  const dotHalo = document.getElementById('dot-halo');
-  if (!path || !dotCore || !dotHalo) return;
-
-  const totalLength = path.getTotalLength();
-  const startFrac = MILESTONE_FRACTIONS[fromIndex] || (fromIndex / 5);
-  const endFrac = MILESTONE_FRACTIONS[toIndex] || (toIndex / 5);
-
-  const duration = 650;
-  const startTime = performance.now();
-
-  if (state.animatingDot) {
-    cancelAnimationFrame(state.animatingDot);
-  }
-
-  function step(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
+    const frac = MILESTONE_FRACTIONS[slideIndex] || (slideIndex / 5);
+    const currentDist = frac * totalLength;
     
-    // Smooth cubic bezier easing
-    const eased = progress < 0.5 
-      ? 4 * progress * progress * progress 
-      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-    const currentFrac = startFrac + (endFrac - startFrac) * eased;
-    const currentDist = currentFrac * totalLength;
-
     path.style.strokeDashoffset = `${totalLength - currentDist}`;
 
     const pt = path.getPointAtLength(currentDist);
@@ -186,28 +184,83 @@ function animateDotTransition(fromIndex, toIndex) {
     dotHalo.setAttribute('cx', pt.x);
     dotHalo.setAttribute('cy', pt.y);
 
-    if (progress < 1) {
-      state.animatingDot = requestAnimationFrame(step);
-    } else {
-      updateMilestoneVisuals(toIndex);
-      state.animatingDot = null;
-    }
+    updateMilestoneVisuals(slideIndex);
+  } catch (err) {
+    console.warn('snapDotToSlide error:', err);
   }
+}
 
-  state.animatingDot = requestAnimationFrame(step);
+// ================================================================
+// 4. ANIMATED TRAVELING DOT & PROGRESS TRAIL (650ms RAF)
+// ================================================================
+function animateDotTransition(fromIndex, toIndex) {
+  try {
+    const path = document.getElementById('panoramic-progress-path');
+    const dotCore = document.getElementById('dot-core');
+    const dotHalo = document.getElementById('dot-halo');
+    if (!path || !dotCore || !dotHalo || typeof path.getTotalLength !== 'function') return;
+
+    const totalLength = path.getTotalLength();
+    if (!totalLength || isNaN(totalLength)) return;
+
+    const startFrac = MILESTONE_FRACTIONS[fromIndex] || (fromIndex / 5);
+    const endFrac = MILESTONE_FRACTIONS[toIndex] || (toIndex / 5);
+
+    const duration = 650;
+    const startTime = performance.now();
+
+    if (state.animatingDot) {
+      cancelAnimationFrame(state.animatingDot);
+    }
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Smooth cubic bezier easing
+      const eased = progress < 0.5 
+        ? 4 * progress * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      const currentFrac = startFrac + (endFrac - startFrac) * eased;
+      const currentDist = currentFrac * totalLength;
+
+      try {
+        path.style.strokeDashoffset = `${totalLength - currentDist}`;
+        const pt = path.getPointAtLength(currentDist);
+        dotCore.setAttribute('cx', pt.x);
+        dotCore.setAttribute('cy', pt.y);
+        dotHalo.setAttribute('cx', pt.x);
+        dotHalo.setAttribute('cy', pt.y);
+      } catch (e) {}
+
+      if (progress < 1) {
+        state.animatingDot = requestAnimationFrame(step);
+      } else {
+        updateMilestoneVisuals(toIndex);
+        state.animatingDot = null;
+      }
+    }
+
+    state.animatingDot = requestAnimationFrame(step);
+  } catch (err) {
+    console.warn('animateDotTransition error:', err);
+  }
 }
 
 function updateMilestoneVisuals(activeIndex) {
-  const nodes = document.querySelectorAll('.roadmap-milestone');
-  nodes.forEach((node, i) => {
-    if (i <= activeIndex) {
-      node.setAttribute('fill', '#1A73E8');
-      node.setAttribute('stroke', '#FFFFFF');
-    } else {
-      node.setAttribute('fill', '#FFFFFF');
-      node.setAttribute('stroke', '#E8EAED');
-    }
-  });
+  try {
+    const nodes = document.querySelectorAll('.roadmap-milestone');
+    nodes.forEach((node, i) => {
+      if (i <= activeIndex) {
+        node.setAttribute('fill', '#1A73E8');
+        node.setAttribute('stroke', '#FFFFFF');
+      } else {
+        node.setAttribute('fill', '#FFFFFF');
+        node.setAttribute('stroke', '#E8EAED');
+      }
+    });
+  } catch (e) {}
 }
 
 // ================================================================
@@ -218,30 +271,41 @@ function goToSlide(index) {
   const prev = state.currentSlide;
   state.currentSlide = index;
 
-  // 1. Translate 600vw camera track
+  // 1. Immediately update slide states and accessibility so clicks work immediately
+  updateInertSlideStates();
+
+  // 2. Translate 600vw camera track
   const track = document.getElementById('main-content');
   if (track) {
     track.style.transform = `translateX(-${index * 100}vw)`;
   }
 
-  // 2. Animate traveling dot along full-canvas curve
-  animateDotTransition(prev, index);
+  // 2b. Translate the panoramic SVG roadmap wrapper in sync (it's a sibling of slides-track)
+  const roadmapWrapper = document.querySelector('.panoramic-roadmap-wrapper');
+  if (roadmapWrapper) {
+    roadmapWrapper.style.transform = `translateX(-${index * 100}vw)`;
+    roadmapWrapper.style.transition = 'transform 650ms cubic-bezier(0.4, 0, 0.2, 1)';
+  }
 
   // 3. Update top-bar controls (Back button & Logout)
   updateTopBarVisibility();
 
-  // 4. Update inert attribute on inactive slides
-  updateInertSlideStates();
-
-  // 5. Update Action plan if sliding to Slide 6
+  // 4. Update Action plan if sliding to Slide 6
   if (index === 5) {
     updateActionsDisplay();
   }
 
-  // 6. Scroll active slide to top
+  // 5. Scroll active slide to top
   const activeSlide = document.getElementById(`slide-${index}`);
   if (activeSlide) {
     activeSlide.scrollTop = 0;
+  }
+
+  // 6. Animate traveling dot along full-canvas curve safely (non-blocking)
+  try {
+    animateDotTransition(prev, index);
+  } catch (err) {
+    console.warn('Roadmap animation error:', err);
   }
 }
 
@@ -269,11 +333,15 @@ function updateInertSlideStates() {
   const slides = document.querySelectorAll('.slide');
   slides.forEach((slide, idx) => {
     if (idx === state.currentSlide) {
+      try { slide.inert = false; } catch (e) {}
       slide.removeAttribute('inert');
       slide.setAttribute('aria-hidden', 'false');
+      slide.style.pointerEvents = 'auto';
     } else {
+      try { slide.inert = true; } catch (e) {}
       slide.setAttribute('inert', '');
       slide.setAttribute('aria-hidden', 'true');
+      slide.style.pointerEvents = 'none';
     }
   });
 }
@@ -282,18 +350,22 @@ function updateInertSlideStates() {
 // 6. SLIDE 2: PERSONA SELECTION
 // ================================================================
 function selectPersona(personaKey) {
-  state.persona = personaKey;
-  sessionStorage.setItem('nirvair_persona', personaKey);
+  try {
+    state.persona = personaKey;
+    safeSessionSet('nirvair_persona', personaKey);
 
-  document.querySelectorAll('.persona-card').forEach(card => {
-    card.classList.remove('active');
-  });
-  const activeCard = document.querySelector(`.persona-card[onclick*="${personaKey}"]`);
-  if (activeCard) activeCard.classList.add('active');
+    document.querySelectorAll('.persona-card').forEach(card => {
+      card.classList.remove('active');
+    });
+    const activeCard = document.querySelector(`.persona-card[onclick*="${personaKey}"]`);
+    if (activeCard) activeCard.classList.add('active');
 
-  const ind = document.getElementById('action-persona-indicator');
-  if (ind) {
-    ind.textContent = `Role: ${state.personaLabels[personaKey] || personaKey}`;
+    const ind = document.getElementById('action-persona-indicator');
+    if (ind) {
+      ind.textContent = `Role: ${state.personaLabels[personaKey] || personaKey}`;
+    }
+  } catch (err) {
+    console.warn('selectPersona error:', err);
   }
 
   // Slide to Slide 3 (Login Gate)
@@ -305,7 +377,7 @@ function selectPersona(personaKey) {
 // ================================================================
 function checkSessionAuth() {
   try {
-    const raw = sessionStorage.getItem('nirvair_session');
+    const raw = safeSessionGet('nirvair_session');
     if (raw) {
       const sess = JSON.parse(raw);
       if (sess && sess.token) {
@@ -342,7 +414,7 @@ async function handleLoginSubmit(e) {
     if (res.ok && data.success) {
       state.isAuthenticated = true;
       state.user = data.user || { username };
-      sessionStorage.setItem('nirvair_session', JSON.stringify({ token: data.token, user: data.user }));
+      safeSessionSet('nirvair_session', JSON.stringify({ token: data.token, user: data.user }));
       updateTopBarVisibility();
       showToast('Authenticated as PromtWars.');
       goToSlide(3); // Slide 4 (Locality & Data Ingestion)
@@ -356,7 +428,7 @@ async function handleLoginSubmit(e) {
     // Offline demo fallback
     if (username === 'PromtWars' && password === 'google') {
       state.isAuthenticated = true;
-      sessionStorage.setItem('nirvair_session', JSON.stringify({ token: 'demo-token', user: { username } }));
+      safeSessionSet('nirvair_session', JSON.stringify({ token: 'demo-token', user: { username } }));
       updateTopBarVisibility();
       showToast('Offline session authenticated.');
       goToSlide(3);
@@ -372,7 +444,7 @@ async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
   } catch (e) {}
 
-  sessionStorage.removeItem('nirvair_session');
+  safeSessionRemove('nirvair_session');
   state.isAuthenticated = false;
   state.user = null;
   updateTopBarVisibility();

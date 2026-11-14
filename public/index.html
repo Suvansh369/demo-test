@@ -16,7 +16,7 @@
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Google-Editorial Minimalist Design System -->
-  <link rel="stylesheet" href="/app.css?v=20261114_02">
+  <link rel="stylesheet" href="/app.css?v=20261114_03">
 </head>
 <body>
 
@@ -127,7 +127,7 @@
 
           <div class="persona-grid" role="group" aria-label="Civic Persona Selection">
             <!-- 1. Local Authority -->
-            <button type="button" class="persona-card" onclick="selectPersona('local_authority')" aria-label="Select persona: Local Authority (Municipal Commissioners & Pollution Control Boards)">
+            <button type="button" class="persona-card" data-persona="local_authority" onclick="selectPersona('local_authority')" aria-label="Select persona: Local Authority (Municipal Commissioners & Pollution Control Boards)">
               <div class="persona-icon-box" aria-hidden="true">🏛️</div>
               <div class="persona-title">Local Authority</div>
               <div class="persona-desc">Municipal Commissioners, Pollution Control Boards & Urban Development Authorities.</div>
@@ -135,7 +135,7 @@
             </button>
 
             <!-- 2. Housing Society -->
-            <button type="button" class="persona-card" onclick="selectPersona('housing_society')" aria-label="Select persona: Housing Society (RWA Presidents & Facility Managers)">
+            <button type="button" class="persona-card" data-persona="housing_society" onclick="selectPersona('housing_society')" aria-label="Select persona: Housing Society (RWA Presidents & Facility Managers)">
               <div class="persona-icon-box" aria-hidden="true">🏢</div>
               <div class="persona-title">Housing Society</div>
               <div class="persona-desc">RWA Presidents, Gated Community Committees & Estate Facility Managers.</div>
@@ -143,7 +143,7 @@
             </button>
 
             <!-- 3. Ward-Level Team -->
-            <button type="button" class="persona-card" onclick="selectPersona('ward_officer')" aria-label="Select persona: Ward-Level Team (Corporators & Field Sanitation Staff)">
+            <button type="button" class="persona-card" data-persona="ward_officer" data-role="ward_officer" onclick="selectPersona('ward_officer')" aria-label="Select persona: Ward-Level Team (Corporators & Field Sanitation Staff)">
               <div class="persona-icon-box" aria-hidden="true">🛡️</div>
               <div class="persona-title">Ward-Level Team</div>
               <div class="persona-desc">Ward Corporators, Zonal Health Officers & Municipal Field Sanitation Teams.</div>
@@ -151,7 +151,7 @@
             </button>
 
             <!-- 4. Schools -->
-            <button type="button" class="persona-card" onclick="selectPersona('school')" aria-label="Select persona: Schools (Principals & Physical Education Directors)">
+            <button type="button" class="persona-card" data-persona="school" onclick="selectPersona('school')" aria-label="Select persona: Schools (Principals & Physical Education Directors)">
               <div class="persona-icon-box" aria-hidden="true">🏫</div>
               <div class="persona-title">Schools</div>
               <div class="persona-desc">School Principals, Physical Education Directors & Childcare Administrators.</div>
@@ -159,7 +159,7 @@
             </button>
 
             <!-- 5. Individual -->
-            <button type="button" class="persona-card" onclick="selectPersona('citizen')" aria-label="Select persona: Individual Trying to Bring a Change (Citizen Advocates & Residents)">
+            <button type="button" class="persona-card" data-persona="citizen" onclick="selectPersona('citizen')" aria-label="Select persona: Individual Trying to Bring a Change (Citizen Advocates & Residents)">
               <div class="persona-icon-box" aria-hidden="true">🌱</div>
               <div class="persona-title">Individual Trying to Bring a Change</div>
               <div class="persona-desc">Neighborhood advocates, concerned parents & proactive civic champions.</div>
@@ -570,6 +570,6 @@ Keep windows closed during early morning rush hours.
   <div id="toast-notification" role="status" aria-live="polite"></div>
 
   <!-- Main Application Logic Script (Cache-busted) -->
-  <script src="/app.js?v=20261114_02"></script>
+  <script src="/app.js?v=20261114_03"></script>
 </body>
 </html>

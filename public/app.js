@@ -113,7 +113,7 @@ if (document.readyState === 'loading') {
 }
 
 /**
- * Attaches direct event listeners as an additional safety layer
+ * Attaches direct event listeners and global delegation for bulletproof click handling
  */
 function attachButtonListeners() {
   const heroBtn = document.getElementById('hero-start-btn');
@@ -131,6 +131,52 @@ function attachButtonListeners() {
       prevSlide();
     });
   }
+
+  // Direct click bindings on all persona cards
+  document.querySelectorAll('.persona-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e && e.preventDefault) e.preventDefault();
+      const persona = card.getAttribute('data-persona') || 
+                      card.getAttribute('data-role') ||
+                      card.getAttribute('onclick')?.match(/selectPersona\('([^']+)'\)/)?.[1];
+      if (persona) {
+        selectPersona(persona);
+      }
+    });
+  });
+
+  // Global event delegation for all interactive elements
+  document.addEventListener('click', (e) => {
+    // 1. Persona card clicks
+    const personaCard = e.target.closest('.persona-card');
+    if (personaCard) {
+      const persona = personaCard.getAttribute('data-persona') || 
+                      personaCard.getAttribute('data-role') ||
+                      personaCard.getAttribute('onclick')?.match(/selectPersona\('([^']+)'\)/)?.[1];
+      if (persona) {
+        if (e && e.preventDefault) e.preventDefault();
+        selectPersona(persona);
+        return;
+      }
+    }
+
+    // 2. Locality pills
+    const pill = e.target.closest('.locality-pill');
+    if (pill) {
+      const locMatch = pill.getAttribute('onclick')?.match(/setLocality\('([^']+)'\)/)?.[1];
+      if (locMatch) {
+        setLocality(locMatch);
+        return;
+      }
+    }
+
+    // 3. Brand Home click
+    const brand = e.target.closest('.brand-minimal');
+    if (brand) {
+      goToSlide(0);
+      return;
+    }
+  });
 }
 
 /**

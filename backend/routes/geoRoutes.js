@@ -222,8 +222,22 @@ async function handleNeighbourhoodSources(req, res, next) {
     }
 
     const locality = sanitizeString(req.query.locality || 'Locality', 100);
+    const sourcesCacheKey = `sources_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+    const cachedSources = cache.get(sourcesCacheKey);
+    if (cachedSources) {
+      return res.json({
+        success: true,
+        locality,
+        center: { lat, lon },
+        totalSources: cachedSources.value.length,
+        sources: cachedSources.value,
+        cached: true
+      });
+    }
+
     const result = await getNeighbourhoodSources(lat, lon, locality);
     const sources = Array.isArray(result) ? result : (result.sources || []);
+    cache.set(sourcesCacheKey, sources, 1800); // 30-minute cache
 
     res.json({
       success: true,

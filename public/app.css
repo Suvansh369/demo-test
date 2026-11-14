@@ -418,6 +418,9 @@ textarea:focus-visible,
   transition: all 200ms ease;
   box-shadow: 0 1px 3px rgba(60,64,67,0.06);
 }
+.persona-card * {
+  pointer-events: none !important;
+}
 .persona-card:hover {
   border-color: var(--google-blue);
   box-shadow: 0 4px 16px rgba(26, 115, 232, 0.12);

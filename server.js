@@ -1,6 +1,7 @@
 require('dotenv').config(); // MUST BE LINE 1
 
 const express = require('express');
+const compression = require('compression');
 const path = require('path');
 const { configureHelmet, configureCors, generalLimiter } = require('./backend/middleware/security');
 const errorHandler = require('./backend/middleware/errorHandler');
@@ -14,6 +15,9 @@ const interventionRoutes = require('./backend/routes/interventionRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Compression for optimal network payload efficiency
+app.use(compression());
 
 // Security & Parsing Middleware registered BEFORE mounting routes
 app.use(configureHelmet());

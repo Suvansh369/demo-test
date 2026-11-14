@@ -103,9 +103,15 @@ router.post('/data', uploadLimiter, uploadMiddleware, async (req, res, next) => 
       console.warn('AI explanation error (fallback returned):', aiErr.message);
     }
 
+    // Optimize response payload: limit sample rows to 50 for transfer efficiency
+    const optimizedProcessed = {
+      ...processed,
+      sampleRows: (processed.evaluatedRows || []).slice(0, 50)
+    };
+
     res.json({
       success: true,
-      processed,
+      processed: optimizedProcessed,
       aiExplanation
     });
   } catch (err) {

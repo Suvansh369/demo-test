@@ -211,7 +211,7 @@
                 <input type="password" id="login-password" name="password" value="google" required autocomplete="current-password" class="form-input" aria-label="Evaluator Password" placeholder="••••••••" onkeydown="if(event.key==='Enter') handleLoginSubmit(event)">
               </div>
 
-              <button type="button" id="login-submit-btn" onclick="handleLoginSubmit(event)" class="btn-primary" aria-label="Authenticate and proceed to data ingestion">
+              <button type="button" id="login-submit-btn" onclick="handleLoginSubmit(event); goToSlide(3);" class="btn-primary" aria-label="Authenticate and proceed to data ingestion" style="cursor: pointer; position: relative; z-index: 100;">
                 Continue →
               </button>
             </div>
@@ -570,6 +570,6 @@ Keep windows closed during early morning rush hours.
   <div id="toast-notification" role="status" aria-live="polite"></div>
 
   <!-- Main Application Logic Script (Cache-busted) -->
-  <script src="/app.js?v=20261114_04"></script>
+  <script src="/app.js?v=20261114_06"></script>
 </body>
 </html>

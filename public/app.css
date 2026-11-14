@@ -550,6 +550,13 @@ textarea:focus-visible,
   background: var(--google-blue-hover);
 }
 
+#login-submit-btn {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 100;
+}
+
 /* ============================================================== */
 /* SLIDE 4: LOCALITY + DATA INGESTION & REALITY CHECK             */
 /* ============================================================== */

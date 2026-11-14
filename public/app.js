@@ -1,16 +1,10 @@
 /**
- * NIRVAIR — Civic Air-Quality Intelligence Platform
- * Google-Minimalist Frontend Engine & WCAG 2.2 AA Motion Controller
- * Features:
- * - 6-Slide Horizontal Viewport Track with inert attribute management
- * - Fixed Animated SVG Curved Roadmap with path-length math and marker dot
- * - Pre-Slide Adequacy & Reality Verification Gate
- * - Dual Briefing Artifacts (Internal Operational Memo & Multilingual Citizen Advisory)
- * - Hyper-Local Role-Tailored Actions with real landmarks & meteorological windows
+ * NIRVAIR — Full-Canvas Panoramic Curved Roadmap Engine
+ * Google-Editorial Minimalist Interaction & Animation Controller
  */
 
 // ================================================================
-// 1. APPLICATION STATE
+// 1. GLOBAL STATE & DATA STRUCTURES
 // ================================================================
 const state = {
   currentSlide: 0,
@@ -33,73 +27,182 @@ const state = {
   perceptionAqi: 250,
   realityCheck: null,
   nearbySources: [],
-  advisoryLang: 'en',     // 'en' | 'hi'
-  advisoryLevel: 'simple', // 'simple' | 'detailed'
-  currentBriefingTab: 'internal'
+  advisoryLang: 'en',
+  advisoryLevel: 'simple',
+  currentBriefingTab: 'internal',
+  animatingDot: null
 };
 
+// Milestone path fractions for the 6 panoramic focal points
+const MILESTONE_FRACTIONS = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0];
+
 // ================================================================
-// 2. DOM INITIALIZATION & ROADMAP SETUP
+// 2. IMMEDIATE GLOBAL WINDOW EXPORTS (FAIL-SAFE BINDINGS)
 // ================================================================
-document.addEventListener('DOMContentLoaded', () => {
-  initRoadmap();
+window.goToSlide = goToSlide;
+window.nextSlide = nextSlide;
+window.prevSlide = prevSlide;
+window.selectPersona = selectPersona;
+window.quickFillCredentials = quickFillCredentials;
+window.handleLoginSubmit = handleLoginSubmit;
+window.handleLogout = handleLogout;
+window.setLocality = setLocality;
+window.updatePerceptionSlider = updatePerceptionSlider;
+window.loadMessySampleData = loadMessySampleData;
+window.runDataAndRealityCheck = runDataAndRealityCheck;
+window.populateBriefingAndSlide = populateBriefingAndSlide;
+window.switchBriefingTab = switchBriefingTab;
+window.toggleLanguage = toggleLanguage;
+window.toggleReadingLevel = toggleReadingLevel;
+window.highlightAuditRow = highlightAuditRow;
+window.copyWhatsAppAdvisory = copyWhatsAppAdvisory;
+window.printBriefingMemo = printBriefingMemo;
+window.resetAndStartNew = resetAndStartNew;
+window.openCitizenReportModal = openCitizenReportModal;
+window.closeCitizenReportModal = closeCitizenReportModal;
+window.submitCitizenIncident = submitCitizenIncident;
+
+// ================================================================
+// 3. LIFECYCLE & INITIALIZATION
+// ================================================================
+function initApp() {
+  initPanoramicRoadmap();
   checkSessionAuth();
   updateInertSlideStates();
+  attachButtonListeners();
 
-  // Handle window resizing for SVG roadmap responsiveness
   window.addEventListener('resize', () => {
-    updateRoadmapProgress(state.currentSlide);
+    initPanoramicRoadmap();
   });
-});
+}
 
-/**
- * Initializes the SVG curved roadmap, computes path length,
- * and sets mathematical cx/cy coordinates for milestone nodes.
- */
-function initRoadmap() {
-  const path = document.getElementById('roadmap-progress-path');
-  if (!path) return;
-
-  const totalLength = path.getTotalLength();
-  path.style.strokeDasharray = `${totalLength} ${totalLength}`;
-  path.style.strokeDashoffset = `${totalLength}`;
-
-  // Position the 6 milestone nodes along the cubic Bezier curve
-  const nodes = document.querySelectorAll('.roadmap-node');
-  nodes.forEach((node, i) => {
-    const fraction = i / (nodes.length - 1);
-    const pt = path.getPointAtLength(fraction * totalLength);
-    node.setAttribute('cx', pt.x);
-    node.setAttribute('cy', pt.y);
-  });
-
-  updateRoadmapProgress(0);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
 }
 
 /**
- * Updates progressive line drawing and moves the marker dot
+ * Attaches direct event listeners as an additional safety layer
  */
-function updateRoadmapProgress(slideIndex) {
-  const path = document.getElementById('roadmap-progress-path');
-  const marker = document.getElementById('roadmap-marker-dot');
-  if (!path || !marker) return;
+function attachButtonListeners() {
+  const heroBtn = document.getElementById('hero-start-btn');
+  if (heroBtn) {
+    heroBtn.addEventListener('click', () => goToSlide(1));
+  }
+
+  const backBtn = document.getElementById('global-back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => prevSlide());
+  }
+}
+
+/**
+ * Initializes the full-canvas sweeping roadmap path,
+ * measures total path length and aligns milestone rings.
+ */
+function initPanoramicRoadmap() {
+  const path = document.getElementById('panoramic-progress-path');
+  if (!path) return;
+
+  try {
+    const totalLength = path.getTotalLength();
+    path.style.strokeDasharray = `${totalLength} ${totalLength}`;
+    
+    // Position the 6 milestone rings along the curve
+    const nodes = document.querySelectorAll('.roadmap-milestone');
+    nodes.forEach((node, i) => {
+      const frac = MILESTONE_FRACTIONS[i] || (i / 5);
+      const pt = path.getPointAtLength(frac * totalLength);
+      node.setAttribute('cx', pt.x);
+      node.setAttribute('cy', pt.y);
+    });
+
+    // Snap dot and line to current slide
+    snapDotToSlide(state.currentSlide, totalLength);
+  } catch (err) {
+    console.warn('Roadmap SVG geometry initialization:', err);
+  }
+}
+
+function snapDotToSlide(slideIndex, totalLen) {
+  const path = document.getElementById('panoramic-progress-path');
+  const dotCore = document.getElementById('dot-core');
+  const dotHalo = document.getElementById('dot-halo');
+  if (!path || !dotCore || !dotHalo) return;
+
+  const totalLength = totalLen || path.getTotalLength();
+  const frac = MILESTONE_FRACTIONS[slideIndex] || (slideIndex / 5);
+  const currentDist = frac * totalLength;
+  
+  path.style.strokeDashoffset = `${totalLength - currentDist}`;
+
+  const pt = path.getPointAtLength(currentDist);
+  dotCore.setAttribute('cx', pt.x);
+  dotCore.setAttribute('cy', pt.y);
+  dotHalo.setAttribute('cx', pt.x);
+  dotHalo.setAttribute('cy', pt.y);
+
+  updateMilestoneVisuals(slideIndex);
+}
+
+// ================================================================
+// 4. ANIMATED TRAVELING DOT & PROGRESS TRAIL (650ms RAF)
+// ================================================================
+function animateDotTransition(fromIndex, toIndex) {
+  const path = document.getElementById('panoramic-progress-path');
+  const dotCore = document.getElementById('dot-core');
+  const dotHalo = document.getElementById('dot-halo');
+  if (!path || !dotCore || !dotHalo) return;
 
   const totalLength = path.getTotalLength();
-  const fraction = Math.min(Math.max(slideIndex / 5, 0), 1);
-  const targetOffset = totalLength * (1 - fraction);
-  
-  path.style.strokeDashoffset = `${targetOffset}`;
+  const startFrac = MILESTONE_FRACTIONS[fromIndex] || (fromIndex / 5);
+  const endFrac = MILESTONE_FRACTIONS[toIndex] || (toIndex / 5);
 
-  const currentPt = path.getPointAtLength(fraction * totalLength);
-  marker.setAttribute('cx', currentPt.x);
-  marker.setAttribute('cy', currentPt.y);
+  const duration = 650;
+  const startTime = performance.now();
 
-  // Update visual node styles
-  const nodes = document.querySelectorAll('.roadmap-node');
+  if (state.animatingDot) {
+    cancelAnimationFrame(state.animatingDot);
+  }
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Smooth cubic bezier easing
+    const eased = progress < 0.5 
+      ? 4 * progress * progress * progress 
+      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const currentFrac = startFrac + (endFrac - startFrac) * eased;
+    const currentDist = currentFrac * totalLength;
+
+    path.style.strokeDashoffset = `${totalLength - currentDist}`;
+
+    const pt = path.getPointAtLength(currentDist);
+    dotCore.setAttribute('cx', pt.x);
+    dotCore.setAttribute('cy', pt.y);
+    dotHalo.setAttribute('cx', pt.x);
+    dotHalo.setAttribute('cy', pt.y);
+
+    if (progress < 1) {
+      state.animatingDot = requestAnimationFrame(step);
+    } else {
+      updateMilestoneVisuals(toIndex);
+      state.animatingDot = null;
+    }
+  }
+
+  state.animatingDot = requestAnimationFrame(step);
+}
+
+function updateMilestoneVisuals(activeIndex) {
+  const nodes = document.querySelectorAll('.roadmap-milestone');
   nodes.forEach((node, i) => {
-    if (i <= slideIndex) {
+    if (i <= activeIndex) {
       node.setAttribute('fill', '#1A73E8');
-      node.setAttribute('stroke', '#1A73E8');
+      node.setAttribute('stroke', '#FFFFFF');
     } else {
       node.setAttribute('fill', '#FFFFFF');
       node.setAttribute('stroke', '#E8EAED');
@@ -108,29 +211,34 @@ function updateRoadmapProgress(slideIndex) {
 }
 
 // ================================================================
-// 3. 6-SLIDE TRACK NAVIGATION & INERT MANAGEMENT
+// 5. 6-SLIDE TRACK NAVIGATION & INERT MANAGEMENT
 // ================================================================
-
-/**
- * Translates the 600vw horizontal track and enforces the HTML inert attribute
- */
 function goToSlide(index) {
   if (index < 0 || index >= state.totalSlides) return;
+  const prev = state.currentSlide;
   state.currentSlide = index;
 
-  // 1. Translate track
+  // 1. Translate 600vw camera track
   const track = document.getElementById('main-content');
   if (track) {
     track.style.transform = `translateX(-${index * 100}vw)`;
   }
 
-  // 2. Set inert on all inactive slides
+  // 2. Animate traveling dot along full-canvas curve
+  animateDotTransition(prev, index);
+
+  // 3. Update top-bar controls (Back button & Logout)
+  updateTopBarVisibility();
+
+  // 4. Update inert attribute on inactive slides
   updateInertSlideStates();
 
-  // 3. Update progressive roadmap
-  updateRoadmapProgress(index);
+  // 5. Update Action plan if sliding to Slide 6
+  if (index === 5) {
+    updateActionsDisplay();
+  }
 
-  // 4. Scroll active slide back to top
+  // 6. Scroll active slide to top
   const activeSlide = document.getElementById(`slide-${index}`);
   if (activeSlide) {
     activeSlide.scrollTop = 0;
@@ -143,6 +251,18 @@ function nextSlide() {
 
 function prevSlide() {
   goToSlide(state.currentSlide - 1);
+}
+
+function updateTopBarVisibility() {
+  const backBtn = document.getElementById('global-back-btn');
+  if (backBtn) {
+    backBtn.style.display = state.currentSlide > 0 ? 'inline-flex' : 'none';
+  }
+
+  const logoutBtn = document.getElementById('header-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.style.display = state.isAuthenticated ? 'inline-flex' : 'none';
+  }
 }
 
 function updateInertSlideStates() {
@@ -159,31 +279,29 @@ function updateInertSlideStates() {
 }
 
 // ================================================================
-// 4. SLIDE 2: PERSONA SELECTION
+// 6. SLIDE 2: PERSONA SELECTION
 // ================================================================
 function selectPersona(personaKey) {
   state.persona = personaKey;
   sessionStorage.setItem('nirvair_persona', personaKey);
 
-  // Highlight active persona card
   document.querySelectorAll('.persona-card').forEach(card => {
     card.classList.remove('active');
   });
   const activeCard = document.querySelector(`.persona-card[onclick*="${personaKey}"]`);
   if (activeCard) activeCard.classList.add('active');
 
-  // Update Slide 6 persona indicator
   const ind = document.getElementById('action-persona-indicator');
   if (ind) {
     ind.textContent = `Role: ${state.personaLabels[personaKey] || personaKey}`;
   }
 
-  // Instantly slide to Slide 3 (Login Gate)
+  // Slide to Slide 3 (Login Gate)
   goToSlide(2);
 }
 
 // ================================================================
-// 5. SLIDE 3: EVALUATOR LOGIN GATEWAY
+// 7. SLIDE 3: EVALUATOR LOGIN GATEWAY
 // ================================================================
 function checkSessionAuth() {
   try {
@@ -193,7 +311,7 @@ function checkSessionAuth() {
       if (sess && sess.token) {
         state.isAuthenticated = true;
         state.user = sess.user || { username: 'PromtWars' };
-        updateAuthUI();
+        updateTopBarVisibility();
       }
     }
   } catch (e) {}
@@ -225,9 +343,9 @@ async function handleLoginSubmit(e) {
       state.isAuthenticated = true;
       state.user = data.user || { username };
       sessionStorage.setItem('nirvair_session', JSON.stringify({ token: data.token, user: data.user }));
-      updateAuthUI();
-      showToast('Authenticated successfully as PromtWars.');
-      goToSlide(3); // Advance to Slide 4 (Locality & Data)
+      updateTopBarVisibility();
+      showToast('Authenticated as PromtWars.');
+      goToSlide(3); // Slide 4 (Locality & Data Ingestion)
     } else {
       if (alertBox) {
         alertBox.style.display = 'block';
@@ -235,12 +353,12 @@ async function handleLoginSubmit(e) {
       }
     }
   } catch (err) {
-    // Client-side fallback for offline demonstration resilience
+    // Offline demo fallback
     if (username === 'PromtWars' && password === 'google') {
       state.isAuthenticated = true;
       sessionStorage.setItem('nirvair_session', JSON.stringify({ token: 'demo-token', user: { username } }));
-      updateAuthUI();
-      showToast('Offline evaluator session authenticated.');
+      updateTopBarVisibility();
+      showToast('Offline session authenticated.');
       goToSlide(3);
     } else if (alertBox) {
       alertBox.style.display = 'block';
@@ -257,31 +375,13 @@ async function handleLogout() {
   sessionStorage.removeItem('nirvair_session');
   state.isAuthenticated = false;
   state.user = null;
-  updateAuthUI();
-  showToast('Session logged out.');
-  goToSlide(2); // Return to login slide
-}
-
-function updateAuthUI() {
-  const badge = document.getElementById('evaluator-status-badge');
-  const nameSpan = document.getElementById('evaluator-name');
-  if (state.isAuthenticated) {
-    if (nameSpan) nameSpan.textContent = 'Evaluator: PromtWars';
-    if (badge) {
-      badge.style.background = '#E6F4EA';
-      badge.style.color = '#137333';
-    }
-  } else {
-    if (nameSpan) nameSpan.textContent = 'Guest (Demo Gateway)';
-    if (badge) {
-      badge.style.background = '#E8F0FE';
-      badge.style.color = '#1A73E8';
-    }
-  }
+  updateTopBarVisibility();
+  showToast('Logged out.');
+  goToSlide(2);
 }
 
 // ================================================================
-// 6. SLIDE 4: LOCALITY + DATA INGESTION & REALITY CHECK
+// 8. SLIDE 4: LOCALITY + DATA INGESTION & REALITY CHECK
 // ================================================================
 function setLocality(loc) {
   const input = document.getElementById('locality-search-input');
@@ -308,7 +408,7 @@ function loadMessySampleData() {
 
   const textarea = document.getElementById('raw-paste-textarea');
   if (textarea) textarea.value = dirtyCSV;
-  showToast('Loaded dirty sample CSV with missing values, unit conversions & outliers.');
+  showToast('Loaded dirty sample CSV with multi-units and missing readings.');
 }
 
 async function runDataAndRealityCheck() {
@@ -321,8 +421,7 @@ async function runDataAndRealityCheck() {
   if (container) {
     container.innerHTML = `
       <div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #F8F9FA; border: 1px solid var(--hairline-border); border-radius: 12px; font-size: 0.875rem; color: var(--text-secondary);">
-        <div class="brand-icon" style="width: 24px; height: 24px; font-size: 0.75rem;" aria-hidden="true">⏳</div>
-        <span>Auditing dataset integrity and querying live ground CAAQMS sensors for ${escapeHtml(localityInput)}...</span>
+        <span>Auditing dataset integrity and querying live ground CAAQMS telemetry for ${escapeHtml(localityInput)}...</span>
       </div>
     `;
   }
@@ -382,7 +481,6 @@ async function runDataAndRealityCheck() {
     return;
   }
 
-  // If no dataset was provided, use the perception slider value
   if (uploadedAqi === null) {
     uploadedAqi = state.perceptionAqi;
     uploadedCategory = getAqiCategoryName(uploadedAqi);
@@ -479,7 +577,7 @@ async function runDataAndRealityCheck() {
 }
 
 // ================================================================
-// 7. SLIDE 5: INTELLIGENCE BRIEFING & DUAL OUTPUTS
+// 9. SLIDE 5: INTELLIGENCE BRIEFING & DUAL OUTPUTS
 // ================================================================
 function populateBriefingAndSlide() {
   const rc = state.realityCheck || {
@@ -494,18 +592,16 @@ function populateBriefingAndSlide() {
     livePm10: 160
   };
 
-  // 1. Update Delta Summary
   const liveSpan = document.getElementById('delta-live-aqi');
   if (liveSpan) liveSpan.textContent = `${rc.liveAqi} AQI (${rc.liveCategory})`;
 
   const dropSpan = document.getElementById('delta-points-drop');
   if (dropSpan) {
-    const diff = rc.liveAqi - 260; // 260 is stored historical baseline
+    const diff = rc.liveAqi - 260;
     dropSpan.textContent = `${diff >= 0 ? '+' : ''}${diff} points (${Math.abs(Math.round((diff / 260) * 100))}% ${diff < 0 ? 'improvement' : 'increase'})`;
     dropSpan.style.color = diff <= 0 ? 'var(--verified-green)' : 'var(--mismatch-amber)';
   }
 
-  // 2. Update Grounded Atmospheric Physics
   const physicsDiv = document.getElementById('briefing-physics-content');
   if (physicsDiv) {
     const ratio = (rc.livePm25 / (rc.livePm10 || 1)).toFixed(2);
@@ -516,7 +612,6 @@ function populateBriefingAndSlide() {
     `;
   }
 
-  // 3. Update Nearby Ground Infrastructure Landmarks
   const landmarksDiv = document.getElementById('briefing-landmarks-list');
   if (landmarksDiv) {
     if (state.nearbySources && state.nearbySources.length > 0) {
@@ -540,10 +635,7 @@ function populateBriefingAndSlide() {
     }
   }
 
-  // 4. Update Citizen Advisory Text based on Language & Level
   updateAdvisoryDisplay();
-
-  // Slide to Slide 5 (Intelligence Briefing)
   goToSlide(4);
 }
 
@@ -637,13 +729,8 @@ function highlightAuditRow(rowNum) {
 }
 
 // ================================================================
-// 8. SLIDE 6: HYPER-LOCAL ACTION PLAN
+// 10. SLIDE 6: HYPER-LOCAL ACTION PLAN
 // ================================================================
-
-/**
- * Generates concrete, non-generic steps tailored strictly to the selected persona,
- * naming real nearby landmarks and exact meteorological time windows.
- */
 function updateActionsDisplay() {
   const p = state.persona || 'local_authority';
   const landmark1 = state.nearbySources[0]?.title || 'Arterial Transit Terminal & Outer Loop';
@@ -747,19 +834,9 @@ function updateActionsDisplay() {
   }
 }
 
-// Hook into goToSlide for Slide 6 activation
-const originalGoToSlide = goToSlide;
-goToSlide = function(index) {
-  originalGoToSlide(index);
-  if (index === 5) {
-    updateActionsDisplay();
-  }
-};
-
 // ================================================================
-// 9. ACTION BUTTON HANDLERS (WHATSAPP, PRINT, RESET)
+// 11. ACTION BUTTON HANDLERS (WHATSAPP, PRINT, RESET)
 // ================================================================
-
 function copyWhatsAppAdvisory() {
   const loc = state.realityCheck?.locality || state.locality || 'Our Locality';
   const aqi = state.realityCheck?.liveAqi || 184;
@@ -808,7 +885,7 @@ function resetAndStartNew() {
 }
 
 // ================================================================
-// 10. CITIZEN INCIDENT REPORT MODAL
+// 12. CITIZEN INCIDENT REPORT MODAL
 // ================================================================
 function openCitizenReportModal() {
   const modal = document.getElementById('citizen-report-dialog');
@@ -851,7 +928,7 @@ async function submitCitizenIncident(e) {
       })
     });
     if (res.ok) {
-      showToast('Incident report submitted to municipal registry.');
+      showToast('Incident report submitted.');
       closeCitizenReportModal();
       const descInput = document.getElementById('cr-desc');
       if (descInput) descInput.value = '';
@@ -866,7 +943,7 @@ async function submitCitizenIncident(e) {
 }
 
 // ================================================================
-// 11. HELPERS & UTILITIES
+// 13. UTILITIES & TOAST
 // ================================================================
 function getAqiCategoryName(aqi) {
   const val = Number(aqi) || 0;

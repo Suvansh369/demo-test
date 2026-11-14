@@ -1,6 +1,94 @@
 {
   "citizen_reports": [
     {
+      "id": "cr-6beefa2a",
+      "latitude": 28.6,
+      "longitude": 77.2,
+      "locality": "Current Locality",
+      "report_type": "construction_dust",
+      "severity": "high",
+      "description": "alert(\"xss\")Heavy dust plume",
+      "timestamp": "2026-11-14T07:39:18.941Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-c6c0f4b0",
+      "latitude": 28.6508,
+      "longitude": 77.3152,
+      "locality": "Anand Vihar",
+      "report_type": "waste_burning",
+      "severity": "high",
+      "description": "Smoke plume spotted near metro station",
+      "timestamp": "2026-11-14T07:39:02.912Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-13f8c710",
+      "latitude": 28.64,
+      "longitude": 77.24000000000001,
+      "locality": "Concurrent Locality 4",
+      "report_type": "waste_burning",
+      "severity": "low",
+      "description": "Concurrent report 4",
+      "timestamp": "2026-11-14T07:38:59.518Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-af880581",
+      "latitude": 28.630000000000003,
+      "longitude": 77.23,
+      "locality": "Concurrent Locality 3",
+      "report_type": "waste_burning",
+      "severity": "low",
+      "description": "Concurrent report 3",
+      "timestamp": "2026-11-14T07:38:59.513Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-8f1780a0",
+      "latitude": 28.62,
+      "longitude": 77.22,
+      "locality": "Concurrent Locality 2",
+      "report_type": "waste_burning",
+      "severity": "low",
+      "description": "Concurrent report 2",
+      "timestamp": "2026-11-14T07:38:59.509Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-8da0722b",
+      "latitude": 28.610000000000003,
+      "longitude": 77.21000000000001,
+      "locality": "Concurrent Locality 1",
+      "report_type": "waste_burning",
+      "severity": "low",
+      "description": "Concurrent report 1",
+      "timestamp": "2026-11-14T07:38:59.506Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-ecefacb4",
+      "latitude": 28.6,
+      "longitude": 77.2,
+      "locality": "Concurrent Locality 0",
+      "report_type": "waste_burning",
+      "severity": "low",
+      "description": "Concurrent report 0",
+      "timestamp": "2026-11-14T07:38:59.502Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-8766f4e6",
+      "latitude": 28.63,
+      "longitude": 77.21,
+      "locality": "Unit Test Locality",
+      "report_type": "construction_dust",
+      "severity": "moderate",
+      "description": "Test dust plume",
+      "timestamp": "2026-11-14T07:38:57.106Z",
+      "status": "pending"
+    },
+    {
       "id": "cr-7ce75206",
       "latitude": 28.6,
       "longitude": 77.2,
@@ -740,6 +828,22 @@
   ],
   "interventions": [
     {
+      "id": "int-08b290a9",
+      "locality": "Koramangala, Bengaluru",
+      "role": "housing_society",
+      "title": "Pave unsealed boundary road berms",
+      "timeframe": "short_term",
+      "rationale": "Suppresses dry silt resuspension",
+      "evidence": "High PM10 readings",
+      "assigned_to": "Estate Manager",
+      "deadline": "2026-11-21",
+      "status": "completed",
+      "notes": "Completed paver installation.",
+      "verification_method": "",
+      "created_at": "2026-11-14T07:39:32.937Z",
+      "completed_at": "2026-11-14T07:39:32.944Z"
+    },
+    {
       "id": "int-b5dd94ad",
       "locality": "Koramangala, Bengaluru",
       "role": "housing_society",
@@ -885,6 +989,71 @@
     }
   ],
   "aqi_history": [
+    {
+      "id": "snap-912a7e19",
+      "locality": "Delhi Cantt",
+      "latitude": 28.58,
+      "longitude": 77.12,
+      "aqi": 275,
+      "category": "Poor",
+      "pm25": 115,
+      "pm10": 230,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 4.2,
+      "recorded_at": "2026-11-14T07:39:32.591Z"
+    },
+    {
+      "id": "snap-3dac3814",
+      "locality": "Selected Location (28.6315, 77.2167)",
+      "latitude": 28.6315,
+      "longitude": 77.2167,
+      "aqi": 396,
+      "category": "Very Poor",
+      "pm25": 245,
+      "pm10": 210,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 1.6,
+      "recorded_at": "2026-11-14T07:39:19.385Z"
+    },
+    {
+      "id": "snap-df28f052",
+      "locality": "Selected Location (0.0000, 0.0000)",
+      "latitude": 0,
+      "longitude": 0,
+      "aqi": 44,
+      "category": "Good",
+      "pm25": 6.7,
+      "pm10": 12.9,
+      "station_name": "Regional Ambient",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T07:39:18.872Z"
+    },
+    {
+      "id": "snap-b0c7af5f",
+      "locality": "Anand Vihar, East Delhi",
+      "latitude": 28.6508,
+      "longitude": 77.3152,
+      "aqi": 452,
+      "category": "Severe",
+      "pm25": 380,
+      "pm10": 375,
+      "station_name": "Anand Vihar CAAQMS",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T07:39:01.814Z"
+    },
+    {
+      "id": "snap-a89065a9",
+      "locality": "Delhi Baseline Test",
+      "latitude": 28.61,
+      "longitude": 77.2,
+      "aqi": 250,
+      "category": "Poor",
+      "pm25": 110,
+      "pm10": 200,
+      "station_name": "Test Station",
+      "station_distance_km": 1.2,
+      "recorded_at": "2026-11-14T07:38:58.326Z"
+    },
     {
       "id": "snap-22253310",
       "locality": "Delhi Cantt",
@@ -1342,6 +1511,19 @@
     }
   ],
   "datasets": [
+    {
+      "id": "ds-1794641943428",
+      "fileName": "pasted_records.csv",
+      "totalRecords": 5,
+      "analyzedParameter": "PM25",
+      "trustBreakdown": {
+        "GREEN": 2,
+        "YELLOW": 1,
+        "RED": 1,
+        "GREY": 1
+      },
+      "uploadedAt": "2026-11-14T07:39:03.428Z"
+    },
     {
       "id": "ds-1794641176005",
       "fileName": "pasted_records.csv",

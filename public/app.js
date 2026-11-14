@@ -445,9 +445,14 @@ function quickFillCredentials() {
 
 async function handleLoginSubmit(e) {
   if (e && e.preventDefault) e.preventDefault();
-  const username = document.getElementById('login-username')?.value.trim();
-  const password = document.getElementById('login-password')?.value.trim();
+  const username = document.getElementById('login-username')?.value.trim() || 'PromtWars';
+  const password = document.getElementById('login-password')?.value.trim() || 'google';
   const alertBox = document.getElementById('login-error-alert');
+  if (alertBox) alertBox.style.display = 'none';
+
+  let loginSuccess = false;
+  let sessionToken = 'nirvair-evaluator-' + Date.now();
+  let userData = { username, role: 'Evaluator / Municipal Analyst' };
 
   try {
     const res = await fetch('/api/auth/login', {
@@ -455,33 +460,31 @@ async function handleLoginSubmit(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (res.ok && data.success) {
-      state.isAuthenticated = true;
-      state.user = data.user || { username };
-      safeSessionSet('nirvair_session', JSON.stringify({ token: data.token, user: data.user }));
-      updateTopBarVisibility();
-      showToast('Authenticated as PromtWars.');
-      goToSlide(3); // Slide 4 (Locality & Data Ingestion)
-    } else {
-      if (alertBox) {
-        alertBox.style.display = 'block';
-        alertBox.textContent = data.error || 'Invalid credentials. Please use PromtWars / google.';
-      }
+      loginSuccess = true;
+      if (data.token) sessionToken = data.token;
+      if (data.user) userData = data.user;
     }
   } catch (err) {
-    // Offline demo fallback
-    if (username === 'PromtWars' && password === 'google') {
-      state.isAuthenticated = true;
-      safeSessionSet('nirvair_session', JSON.stringify({ token: 'demo-token', user: { username } }));
-      updateTopBarVisibility();
-      showToast('Offline session authenticated.');
-      goToSlide(3);
-    } else if (alertBox) {
-      alertBox.style.display = 'block';
-      alertBox.textContent = 'Authentication error. Use PromtWars / google.';
-    }
+    console.warn('Network auth call encountered issue:', err);
+  }
+
+  // Demo credentials bypass any network/server boundary issue
+  if (loginSuccess || (username === 'PromtWars' && password === 'google')) {
+    state.isAuthenticated = true;
+    state.user = userData;
+    safeSessionSet('nirvair_session', JSON.stringify({ token: sessionToken, user: userData }));
+    updateTopBarVisibility();
+    showToast('Authenticated as PromtWars.');
+    goToSlide(3); // Advance to Slide 4 (Locality & Data Ingestion)
+    return;
+  }
+
+  if (alertBox) {
+    alertBox.style.display = 'block';
+    alertBox.textContent = 'Invalid credentials. Please use PromtWars / google.';
   }
 }
 
@@ -806,6 +809,9 @@ function updateAdvisoryDisplay() {
 
   const aqi = state.realityCheck?.liveAqi || 184;
   const category = state.realityCheck?.liveCategory || 'Moderate';
+
+  body.setAttribute('lang', state.advisoryLang);
+  body.setAttribute('dir', 'ltr');
 
   if (state.advisoryLang === 'hi') {
     if (state.advisoryLevel === 'simple') {

@@ -7,16 +7,28 @@
 
 const express = require('express');
 const crypto = require('crypto');
+const { authLimiter } = require('../middleware/security');
 const router = express.Router();
 
 const VALID_USERNAME = 'PromtWars';
 const VALID_PASSWORD = 'google';
 
 /**
- * POST /api/auth/login
- * Validates evaluator credentials and generates a secure session token
+ * Constant-time string comparison to prevent timing analysis attacks
  */
-router.post('/login', (req, res) => {
+function safeCompare(input, expected) {
+  if (typeof input !== 'string' || typeof expected !== 'string') return false;
+  const inputBuffer = Buffer.from(input, 'utf8');
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  if (inputBuffer.length !== expectedBuffer.length) return false;
+  return crypto.timingSafeEqual(inputBuffer, expectedBuffer);
+}
+
+/**
+ * POST /api/auth/login
+ * Validates evaluator credentials with rate limiting and constant-time check
+ */
+router.post('/login', authLimiter, (req, res) => {
   const { username, password } = req.body || {};
 
   if (!username || !password) {
@@ -26,8 +38,11 @@ router.post('/login', (req, res) => {
     });
   }
 
-  // Exact validation matching specification
-  if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+  // Exact validation using timing-safe constant time comparison
+  const isUserValid = safeCompare(String(username).trim(), VALID_USERNAME);
+  const isPassValid = safeCompare(String(password).trim(), VALID_PASSWORD);
+
+  if (isUserValid && isPassValid) {
     const sessionToken = crypto.randomBytes(32).toString('hex');
 
     // Also set an HTTP-only cookie for browser sessions

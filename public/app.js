@@ -22,7 +22,8 @@ const state = {
   activeActionPlan: null,
   interventions: [],
   map: null,
-  mapMarkers: []
+  mapMarkers: [],
+  lastFocusedElement: null
 };
 
 // Initialize Application on DOM Ready
@@ -41,33 +42,43 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==============================================================
-// 1. NAVIGATION & WORKFLOW SWITCHING
+// 1. NAVIGATION & WORKFLOW SWITCHING (ACCESSIBLE ARIA UPDATES)
 // ==============================================================
 
 function switchTab(workflowId) {
   state.currentWorkflow = workflowId;
 
-  // Toggle sections
+  // Toggle sections and update ARIA states
   ['workflow-a', 'workflow-b', 'workflow-c', 'workflow-d'].forEach(id => {
     const sec = document.getElementById(`section-${id}`);
     const tabBtn = document.getElementById(`tab-btn-${id}`);
     const mobBtn = document.getElementById(`mob-tab-btn-${id}`);
 
     if (id === workflowId) {
-      if (sec) sec.classList.remove('hidden');
+      if (sec) {
+        sec.classList.remove('hidden');
+        sec.removeAttribute('hidden');
+      }
       if (tabBtn) {
         tabBtn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-white bg-slate-800/90 border border-slate-700 shadow-sm flex items-center space-x-2';
+        tabBtn.setAttribute('aria-selected', 'true');
       }
       if (mobBtn) {
         mobBtn.className = 'whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-white bg-slate-800 border border-slate-700';
+        mobBtn.setAttribute('aria-selected', 'true');
       }
     } else {
-      if (sec) sec.classList.add('hidden');
+      if (sec) {
+        sec.classList.add('hidden');
+        sec.setAttribute('hidden', 'true');
+      }
       if (tabBtn) {
         tabBtn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2';
+        tabBtn.setAttribute('aria-selected', 'false');
       }
       if (mobBtn) {
         mobBtn.className = 'whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400';
+        mobBtn.setAttribute('aria-selected', 'false');
       }
     }
   });
@@ -164,15 +175,21 @@ async function fetchLiveAQI(lat, lon, name) {
 function selectPerceptionCategory(cat, defaultVal) {
   state.perceptionCategory = cat;
   state.perceptionEstimate = defaultVal;
-  document.getElementById('perception-slider').value = defaultVal;
+  const slider = document.getElementById('perception-slider');
+  slider.value = defaultVal;
+  slider.setAttribute('aria-valuenow', defaultVal);
+  slider.setAttribute('aria-valuetext', `${defaultVal}, ${cat}`);
   document.getElementById('perception-slider-val').textContent = defaultVal;
 
-  // Highlight selected button
+  // Update ARIA radio button states
   document.querySelectorAll('#aqi-category-buttons .cat-btn').forEach(btn => {
-    btn.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-500/20');
+    btn.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-500/20', 'ring-yellow-500', 'bg-yellow-500/15');
+    btn.setAttribute('aria-checked', 'false');
   });
-  if (event && event.currentTarget) {
-    event.currentTarget.classList.add('ring-2', 'ring-blue-500', 'bg-blue-500/20');
+  if (window.event && window.event.currentTarget) {
+    const btn = window.event.currentTarget;
+    btn.classList.add('ring-2', 'ring-blue-500', 'bg-blue-500/20');
+    btn.setAttribute('aria-checked', 'true');
   }
 }
 
@@ -187,6 +204,10 @@ function updatePerceptionSlider(val) {
   else if (val <= 300) state.perceptionCategory = 'Poor';
   else if (val <= 400) state.perceptionCategory = 'Very Poor';
   else state.perceptionCategory = 'Severe';
+
+  const slider = document.getElementById('perception-slider');
+  slider.setAttribute('aria-valuenow', val);
+  slider.setAttribute('aria-valuetext', `${val}, ${state.perceptionCategory}`);
 }
 
 function revealPerceptionVsReality() {
@@ -438,16 +459,33 @@ function focusOnSource(lat, lon) {
 }
 
 // ==============================================================
-// 5. CITIZEN REPORTING MODAL
+// 5. CITIZEN REPORTING MODAL (ACCESSIBLE FOCUS TRAP)
 // ==============================================================
 
 function openCitizenReportModal() {
+  state.lastFocusedElement = document.activeElement;
   document.getElementById('cr-locality').value = state.currentLocation.name;
-  document.getElementById('citizen-report-modal').classList.remove('hidden');
+  const modal = document.getElementById('citizen-report-modal');
+  modal.classList.remove('hidden');
+  // Focus first input
+  setTimeout(() => {
+    const firstInput = document.getElementById('cr-locality');
+    if (firstInput) firstInput.focus();
+  }, 100);
 }
 
 function closeCitizenReportModal() {
-  document.getElementById('citizen-report-modal').classList.add('hidden');
+  const modal = document.getElementById('citizen-report-modal');
+  modal.classList.add('hidden');
+  if (state.lastFocusedElement) {
+    state.lastFocusedElement.focus();
+  }
+}
+
+function handleModalKeyDown(e) {
+  if (e.key === 'Escape') {
+    closeCitizenReportModal();
+  }
 }
 
 async function submitCitizenReport() {
@@ -498,13 +536,15 @@ async function submitCitizenReport() {
 function selectUserRole(role) {
   state.selectedRole = role;
 
-  // Toggle role button highlights
+  // Toggle role button highlights & ARIA attributes
   ['citizen', 'school', 'society', 'ward_officer'].forEach(r => {
     const btn = document.getElementById(`role-btn-${r}`);
     if (r === role) {
       btn.className = 'role-btn p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition';
+      btn.setAttribute('aria-selected', 'true');
     } else {
       btn.className = 'role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition';
+      btn.setAttribute('aria-selected', 'false');
     }
   });
 
@@ -945,6 +985,8 @@ async function generateReport() {
 
     const data = await res.json();
     if (data.success && data.content) {
+      const out = document.getElementById('report-markdown-content');
+      if (out) out.setAttribute('lang', language || 'en');
       renderMarkdownToHtml(data.content);
     } else {
       alert(data.error || 'Failed to generate report.');

@@ -36,7 +36,7 @@ NIRVAIR is an AI-driven civic air-quality intelligence platform that transforms 
 - **One-Click Evaluator Button**: "Load Sample Messy Dataset" allows instant end-to-end testing.
 
 ### 3. Persistent Intervention Memory & Comparison Tracker
-- SQLite/JSON atomic persistence for committed civic actions.
+- Atomic persistence for committed civic actions.
 - Real-time status management (`Proposed` ➔ `In Progress` ➔ `Completed` ➔ `Abandoned`).
 - **Historical Comparison Engine**: Evaluates what improved, what deteriorated, and which interventions were completed.
 - **Strict Scientific Guardrail**: Enforces **CORRELATION ≠ CAUSATION**, explaining that ambient airshed reductions cannot be casually credited to local actions without 90-day meteorological controls.
@@ -48,9 +48,39 @@ NIRVAIR is an AI-driven civic air-quality intelligence platform that transforms 
 
 ---
 
+## ♿ Accessibility (WCAG 2.2 AA Compliant)
+
+- **Keyboard Navigation**: Universal high-visibility `:focus-visible` ring across all interactive controls (`button`, `input`, `select`, `textarea`, `a`).
+- **Screen Reader Support**: Semantic HTML5 landmarks (`header`, `main`, `section`, `footer`), explicit `<label for="...">` pairings for all inputs, `role="tablist"`/`role="tab"`, and `role="radiogroup"`/`role="radio"`.
+- **Skip Link**: Accessible `<a href="#main-content">` jump link for keyboard power users.
+- **Dynamic Announcements**: Real-time `aria-live="polite"` regions on reveal cards, AI directives, and data trust results.
+- **Vestibular Motion Safety**: Comprehensive `@media (prefers-reduced-motion: reduce)` disabling all decorative animations.
+- **Accessible Maps**: Accessible `role="application"` with descriptive text alternative of all mapped point sources.
+- **Internationalization**: Genuine Devanagari Hindi generation with dynamic `lang="hi"` attribute tags.
+
+---
+
+## 🔒 Security & Hardening
+
+- **Security Headers**: Integrated `helmet` with strict Content Security Policy (CSP), clickjacking defense, MIME-sniffing protection, and suppression of `X-Powered-By`.
+- **CORS Origin Whitelisting**: Restricted to trusted frontend origins via `process.env.ALLOWED_ORIGINS` (no unrestricted wildcard `*`).
+- **Rate Limiting**: Multi-tiered IP rate limiters on global API (150/15m), AI endpoints (40/15m), file analysis (30/15m), and citizen reporting (20/15m).
+- **Strict Input Validation**: Boundary enforcement on geographical coordinates (validating latitude -90..90 and longitude -180..180, properly handling coordinate `0`), enum whitelist validation on report types/severity, and XSS sanitization.
+- **File Upload Guardrails**: Multer file filter enforcing extension whitelist (`.csv`, `.tsv`, `.txt`, `.xlsx`, `.xls`), 10MB file size ceiling, and maximum 10,000 row / 50 column limits to prevent memory exhaustion attacks.
+
+---
+
+## ⚡ Efficiency & Caching
+
+- **Freshness-Aware Caching**: In-memory cache for ambient AQI observations (10-minute TTL) with explicit `cached: true/false`, `cachedAt`, and `ageSeconds` transparency metadata.
+- **Geocoding & AI Deduplication**: Caches geocoding results (24 hours) and identical role action plans (15 minutes) to eliminate redundant external network overhead and API quota consumption.
+- **Network Timeouts**: Explicit 35-second abort controller timeouts on all external network and Gemini calls.
+
+---
+
 ## 🛠️ Architecture & Stack
 
-- **Backend**: Node.js, Express, Multer, XLSX, CORS, Dotenv
+- **Backend**: Node.js, Express, Multer, XLSX, CORS, Dotenv, Helmet, Express-Rate-Limit
 - **Frontend**: Single Page Application, Tailwind CSS, Leaflet.js, Lucide Icons, Chart.js
 - **AI Core**: Google Gemini Generative Language API (`gemini-flash-latest`)
 - **Live Data**: Open-Meteo Air Quality (Copernicus CAMS model) + Open-Meteo Geocoding
@@ -71,10 +101,13 @@ The application will be live at:
 
 ### 2. Run Automated Test Suites
 ```bash
-# Run End-to-End API Suite (28 assertions)
+# Run Security, Efficiency & Accessibility Suite (28 passing checks)
+node tests/security_and_a11y_tests.js
+
+# Run End-to-End API Integration Suite (28 passing checks)
 node test_e2e_endpoints.js
 
-# Run Unit Verification Suite
+# Run Core Unit Verification Suite
 node test_backend_units.js
 ```
 
@@ -82,6 +115,7 @@ node test_backend_units.js
 Stored securely in `.env`:
 ```env
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 PORT=3000
 ```
 *(No external database or API key is exposed to the frontend browser bundle.)*
@@ -89,8 +123,9 @@ PORT=3000
 ---
 
 ## 🛡️ Hackathon Evaluation Checklist
+- [x] **Accessibility**: WCAG 2.2 AA compliant, visible focus indicators, skip link, labels, aria-live, prefers-reduced-motion.
+- [x] **Security**: Helmet CSP, CORS origin whitelisting, rate limiting, strict coordinate validation (including 0), Multer extension filters.
+- [x] **Efficiency**: In-memory TTL caching with provenance metadata, request deduplication, row-processing bounds.
+- [x] **Scientific Integrity**: Station-level measurements explicitly separated from hyperlocal estimates; correlation never conflated with causation.
 - [x] **No static / fake / simulated data**: Live atmospheric data retrieved via Open-Meteo & Copernicus; real calculations using CPCB NAQI standard.
 - [x] **Working buttons**: Every single button, slider, and selector has real functional handlers and API integration.
-- [x] **Server-side AI**: Gemini calls handled securely server-side with structured JSON formatting and timeouts.
-- [x] **Messy table handling**: Ingests real CSVs and Excel workbooks, handles messy aliases, missing rows, negative spikes, and duplicate records.
-- [x] **Scientific integrity**: Clear distinction between station measurements and doorstep microclimates; correlation explicitly distinguished from causation.

@@ -293,7 +293,16 @@ function processAirQualityDataset(rawRows, fileName = 'uploaded_data.csv') {
     throw new Error('Dataset is empty or contains no parseable records.');
   }
 
-  const headers = Object.keys(rawRows[0] || {});
+  // Safety limits to prevent memory exhaustion
+  const MAX_ROWS = 10000;
+  let rowsToProcess = rawRows;
+  let rowLimitWarning = null;
+  if (rawRows.length > MAX_ROWS) {
+    rowsToProcess = rawRows.slice(0, MAX_ROWS);
+    rowLimitWarning = `Dataset exceeded maximum row limit (${MAX_ROWS}); evaluated first ${MAX_ROWS} rows for performance stability.`;
+  }
+
+  const headers = Object.keys(rowsToProcess[0] || {}).slice(0, 50); // limit to 50 columns
   const { mapping } = standardizeColumns(headers);
 
   // Identify key pollutant column
@@ -323,8 +332,8 @@ function processAirQualityDataset(rawRows, fileName = 'uploaded_data.csv') {
 
   let prevNumeric = null;
 
-  for (let idx = 0; idx < rawRows.length; idx++) {
-    const raw = rawRows[idx];
+  for (let idx = 0; idx < rowsToProcess.length; idx++) {
+    const raw = rowsToProcess[idx];
 
     const fingerprint = JSON.stringify(raw);
     let isDuplicate = false;
@@ -393,7 +402,9 @@ function processAirQualityDataset(rawRows, fileName = 'uploaded_data.csv') {
 
   return {
     fileName,
-    totalRecords: rawRows.length,
+    totalRecords: rowsToProcess.length,
+    originalRecordCount: rawRows.length,
+    rowLimitWarning,
     analyzedParameter: targetParam.toUpperCase(),
     analyzedColumn: targetCol,
     detectedHeaders: headers,

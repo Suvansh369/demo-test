@@ -5,6 +5,7 @@
  */
 
 require('dotenv').config();
+const cache = require('./cache');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL_NAME = 'gemini-flash-latest';
@@ -71,6 +72,12 @@ async function callGemini(prompt, isJson = false) {
  * Generates role-tailored action intelligence grounded in live data
  */
 async function generateActionPlan({ role, aqi, category, prominentPollutant, sources = [], locality }) {
+  const cacheKey = `action_plan_${role}_${aqi}_${locality}`;
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return cached.value;
+  }
+
   const sourcesSummary = sources.map(s => `- ${s.title} (${s.category}, ~${s.distanceMeters}m away): ${s.explanation}`).join('\n');
 
   const prompt = `
@@ -130,7 +137,9 @@ Provide exactly 2 actions for immediate, 2 for shortTerm, and 2 for longTerm.
 `;
 
   try {
-    return await callGemini(prompt, true);
+    const plan = await callGemini(prompt, true);
+    cache.set(cacheKey, plan, 900); // 15-minute cache
+    return plan;
   } catch (err) {
     console.error('Gemini Action Plan generation failed, using robust fallback:', err.message);
     return getFallbackActionPlan(role, aqi, category, prominentPollutant, locality);
@@ -181,7 +190,9 @@ Return a JSON object with:
 `;
 
   try {
-    return await callGemini(prompt, true);
+    const plan = await callGemini(prompt, true);
+    cache.set(cacheKey, plan, 900); // 15-minute cache
+    return plan;
   } catch (err) {
     console.error('Gemini Data Analysis explanation failed, using fallback:', err.message);
     return {
@@ -206,6 +217,10 @@ Return a JSON object with:
  * Generates Internal Civic Briefing (for municipal authorities and environmental teams)
  */
 async function generateCivicBriefing({ locality, aqi, category, prominentPollutant, sources = [], interventions = [], stats }) {
+  const cacheKey = `briefing_${locality}_${aqi}_${category}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached.value;
+
   const prompt = `
 You are the Chief Civic Environmental Strategist for NIRVAIR.
 Draft an "Internal Civic Briefing" for municipal commissioners, district magistrates, and environmental enforcement officers.
@@ -228,7 +243,9 @@ Structure the briefing into:
 Output format: Return clean, authoritative Markdown with appropriate section headers, bullet points, and callouts.
 `;
 
-  return await callGemini(prompt, false);
+  const result = await callGemini(prompt, false);
+  cache.set(cacheKey, result, 900);
+  return result;
 }
 
 /**
@@ -236,6 +253,9 @@ Output format: Return clean, authoritative Markdown with appropriate section hea
  */
 async function generateCitizenAdvisory({ locality, aqi, category, prominentPollutant, sources = [], language = 'en', readingLevel = 'standard' }) {
   const isHindi = language === 'hi';
+  const cacheKey = `advisory_${locality}_${aqi}_${language}_${readingLevel}`;
+  const cached = cache.get(cacheKey);
+  if (cached) return cached.value;
 
   const prompt = `
 You are the Public Health Communication Officer for NIRVAIR.
@@ -261,7 +281,9 @@ Requirements:
 Output format: Clean, compassionate, actionable Markdown formatted clearly for public distribution. ${isHindi ? 'Write entirely in natural, fluent Hindi.' : 'Write in clear English.'}
 `;
 
-  return await callGemini(prompt, false);
+  const result = await callGemini(prompt, false);
+  cache.set(cacheKey, result, 900);
+  return result;
 }
 
 // Fallback generator if Gemini network fails

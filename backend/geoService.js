@@ -5,6 +5,7 @@
 
 const { findNearestStation, calculateDistanceKm } = require('./stations');
 const db = require('./db');
+const cache = require('./cache');
 
 // Fallback Indian localities database for instant offline/resilient geocoding
 const INDIAN_LOCALITIES = [
@@ -39,6 +40,11 @@ async function geocodeLocation(query) {
   }
 
   const cleanQuery = query.trim();
+  const cacheKey = `geo_${cleanQuery.toLowerCase()}`;
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return cached.value;
+  }
 
   // Try Open-Meteo Geocoding API first
   try {
@@ -55,7 +61,7 @@ async function geocodeLocation(query) {
         const data = await res.json();
         if (data.results && data.results.length > 0) {
           const inIndia = data.results.find(r => r.country_code === 'IN') || data.results[0];
-          return {
+          const result = {
             name: `${inIndia.name}${inIndia.admin1 ? ', ' + inIndia.admin1 : ''}${inIndia.country ? ', ' + inIndia.country : ''}`,
             city: inIndia.name,
             state: inIndia.admin1 || '',
@@ -64,6 +70,8 @@ async function geocodeLocation(query) {
             longitude: inIndia.longitude,
             source: 'Open-Meteo Geocoding'
           };
+          cache.set(cacheKey, result, 86400); // 24-hour cache
+          return result;
         }
       }
     }

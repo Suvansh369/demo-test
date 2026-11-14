@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NIRVAIR | Know Your Air. Understand Your Neighbourhood. Take Action.</title>
   
+  <!-- Primary Meta Tags -->
+  <meta name="description" content="AI-driven civic air-quality intelligence platform transforming raw air data into neighbourhood understanding and measurable civic action.">
+  <meta name="theme-color" content="#0b0f19">
+
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,14 +57,21 @@
 <body class="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
   <!-- ============================================================== -->
-  <!-- TOP NAVIGATION BAR -->
+  <!-- ACCESSIBILITY: SKIP TO MAIN CONTENT LINK (WCAG 2.2 AA)        -->
   <!-- ============================================================== -->
-  <header class="sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:font-bold focus:rounded-lg focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-white">
+    Skip to main content
+  </a>
+
+  <!-- ============================================================== -->
+  <!-- TOP NAVIGATION BAR                                             -->
+  <!-- ============================================================== -->
+  <header role="banner" class="sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <!-- Logo & Brand -->
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('workflow-a')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
-          <i data-lucide="wind" class="w-5 h-5 text-white"></i>
+      <a href="#main-content" onclick="switchTab('workflow-a')" class="flex items-center space-x-3 cursor-pointer group" aria-label="NIRVAIR Home">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-400 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:opacity-90 transition">
+          <i data-lucide="wind" class="w-5 h-5 text-white" aria-hidden="true"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
@@ -69,32 +80,32 @@
           </div>
           <p class="text-[11px] text-slate-400 hidden sm:block">Know Your Air. Understand Your Neighbourhood. Take Action.</p>
         </div>
-      </div>
+      </a>
 
-      <!-- Navigation Tabs -->
-      <nav class="hidden md:flex items-center space-x-1" id="app-tabs">
-        <button onclick="switchTab('workflow-a')" id="tab-btn-workflow-a" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-white bg-slate-800/80 border border-slate-700/60 shadow-sm flex items-center space-x-2">
-          <i data-lucide="map-pin" class="w-4 h-4 text-blue-400"></i>
+      <!-- Navigation Tabs (Role Tablist for Screen Readers) -->
+      <nav class="hidden md:flex items-center space-x-1" id="app-tabs" role="tablist" aria-label="Application Workflows">
+        <button onclick="switchTab('workflow-a')" id="tab-btn-workflow-a" role="tab" aria-selected="true" aria-controls="section-workflow-a" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-white bg-slate-800/80 border border-slate-700/60 shadow-sm flex items-center space-x-2">
+          <i data-lucide="map-pin" class="w-4 h-4 text-blue-400" aria-hidden="true"></i>
           <span>Understand My Air</span>
         </button>
-        <button onclick="switchTab('workflow-b')" id="tab-btn-workflow-b" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
-          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
+        <button onclick="switchTab('workflow-b')" id="tab-btn-workflow-b" role="tab" aria-selected="false" aria-controls="section-workflow-b" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400" aria-hidden="true"></i>
           <span>Analyse My Data</span>
         </button>
-        <button onclick="switchTab('workflow-c')" id="tab-btn-workflow-c" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
-          <i data-lucide="list-checks" class="w-4 h-4 text-purple-400"></i>
+        <button onclick="switchTab('workflow-c')" id="tab-btn-workflow-c" role="tab" aria-selected="false" aria-controls="section-workflow-c" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
+          <i data-lucide="list-checks" class="w-4 h-4 text-purple-400" aria-hidden="true"></i>
           <span>Intervention Memory</span>
-          <span id="nav-intervention-count" class="text-xs bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded-full border border-purple-500/30">2</span>
+          <span id="nav-intervention-count" class="text-xs bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded-full border border-purple-500/30" aria-label="2 tracked interventions">2</span>
         </button>
-        <button onclick="switchTab('workflow-d')" id="tab-btn-workflow-d" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
-          <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
+        <button onclick="switchTab('workflow-d')" id="tab-btn-workflow-d" role="tab" aria-selected="false" aria-controls="section-workflow-d" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/40 flex items-center space-x-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-amber-400" aria-hidden="true"></i>
           <span>Civic Reports</span>
         </button>
       </nav>
 
       <!-- Live Connectivity Badge -->
-      <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full text-xs">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
+      <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full text-xs" role="status" aria-label="Live backend status: Open-Meteo & Gemini AI Active">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live" aria-hidden="true"></span>
         <span class="text-slate-300 font-mono text-[11px] hidden sm:inline">Open-Meteo & Gemini 3.8</span>
         <span class="text-slate-300 font-mono text-[11px] sm:hidden">Live</span>
       </div>
@@ -102,28 +113,28 @@
   </header>
 
   <!-- Mobile Tab Navigation Bar -->
-  <div class="md:hidden flex overflow-x-auto border-b border-slate-800 bg-slate-900/60 px-2 py-2 space-x-1 text-xs">
-    <button onclick="switchTab('workflow-a')" id="mob-tab-btn-workflow-a" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-white bg-slate-800 border border-slate-700">Understand Air</button>
-    <button onclick="switchTab('workflow-b')" id="mob-tab-btn-workflow-b" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Analyse Data</button>
-    <button onclick="switchTab('workflow-c')" id="mob-tab-btn-workflow-c" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Interventions</button>
-    <button onclick="switchTab('workflow-d')" id="mob-tab-btn-workflow-d" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Civic Reports</button>
+  <div class="md:hidden flex overflow-x-auto border-b border-slate-800 bg-slate-900/60 px-2 py-2 space-x-1 text-xs" role="tablist" aria-label="Mobile Navigation">
+    <button onclick="switchTab('workflow-a')" id="mob-tab-btn-workflow-a" role="tab" aria-selected="true" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-white bg-slate-800 border border-slate-700">Understand Air</button>
+    <button onclick="switchTab('workflow-b')" id="mob-tab-btn-workflow-b" role="tab" aria-selected="false" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Analyse Data</button>
+    <button onclick="switchTab('workflow-c')" id="mob-tab-btn-workflow-c" role="tab" aria-selected="false" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Interventions</button>
+    <button onclick="switchTab('workflow-d')" id="mob-tab-btn-workflow-d" role="tab" aria-selected="false" class="whitespace-nowrap px-3 py-1.5 rounded-md font-medium text-slate-400">Civic Reports</button>
   </div>
 
   <!-- MAIN WORKSPACE CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12">
+  <main id="main-content" role="main" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12" tabindex="-1">
 
     <!-- ============================================================== -->
     <!-- WORKFLOW A: UNDERSTAND MY AIR (CITIZEN & CIVIC INTELLIGENCE)  -->
     <!-- ============================================================== -->
-    <div id="section-workflow-a" class="space-y-12">
+    <div id="section-workflow-a" role="tabpanel" aria-labelledby="tab-btn-workflow-a" class="space-y-12">
 
       <!-- HERO LANDING SECTION -->
-      <section class="text-center pt-6 pb-4 max-w-3xl mx-auto space-y-4">
+      <section role="region" aria-labelledby="hero-heading" class="text-center pt-6 pb-4 max-w-3xl mx-auto space-y-4">
         <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider">
-          <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5" aria-hidden="true"></i>
           <span>Civic Air-Quality Intelligence</span>
         </div>
-        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+        <h1 id="hero-heading" class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
           Do you really know what you're <span class="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">breathing?</span>
         </h1>
         <p class="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
@@ -133,48 +144,49 @@
         <!-- Primary & Secondary CTAs -->
         <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
           <a href="#perception-section" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-600/30 flex items-center space-x-2">
-            <i data-lucide="compass" class="w-4 h-4"></i>
+            <i data-lucide="compass" class="w-4 h-4" aria-hidden="true"></i>
             <span>Explore My Air</span>
           </a>
           <button onclick="switchTab('workflow-b')" class="px-5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-semibold text-sm transition-all flex items-center space-x-2">
-            <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i>
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400" aria-hidden="true"></i>
             <span>Analyse Air Quality Data</span>
           </button>
         </div>
       </section>
 
       <!-- LOCATION SELECTION PANEL -->
-      <section class="glass-panel rounded-2xl p-6 sm:p-8 space-y-4 max-w-4xl mx-auto border border-slate-700/50">
+      <section role="region" aria-labelledby="location-heading" class="glass-panel rounded-2xl p-6 sm:p-8 space-y-4 max-w-4xl mx-auto border border-slate-700/50">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
           <div>
-            <h2 class="text-lg font-bold text-white flex items-center space-x-2">
-              <i data-lucide="search" class="w-5 h-5 text-blue-400"></i>
+            <h2 id="location-heading" class="text-lg font-bold text-white flex items-center space-x-2">
+              <i data-lucide="search" class="w-5 h-5 text-blue-400" aria-hidden="true"></i>
               <span>Select Your Locality</span>
             </h2>
             <p class="text-xs text-slate-400">Choose a location to retrieve real atmospheric measurements and investigate local sources.</p>
           </div>
           <div class="flex items-center space-x-2">
-            <button id="btn-use-geolocation" onclick="requestBrowserGeolocation()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 transition-all flex items-center space-x-1.5">
-              <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+            <button id="btn-use-geolocation" onclick="requestBrowserGeolocation()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 transition-all flex items-center space-x-1.5" aria-label="Use browser geolocation to find current coordinates">
+              <i data-lucide="crosshair" class="w-3.5 h-3.5" aria-hidden="true"></i>
               <span>Use Geolocation</span>
             </button>
           </div>
         </div>
 
-        <!-- Search Bar with Suggestions -->
-        <div class="relative">
-          <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-            <i data-lucide="map-pin" class="w-5 h-5 text-slate-400 mr-3"></i>
-            <input type="text" id="locality-search-input" placeholder="Search locality, city, landmark (e.g. Connaught Place, Anand Vihar, BKC Mumbai, Whitefield)..." class="bg-transparent w-full text-sm text-white placeholder-slate-500 focus:outline-none" onkeydown="if(event.key === 'Enter') handleSearchSubmit()">
-            <button onclick="handleSearchSubmit()" class="ml-2 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition-all">
+        <!-- Search Bar with Label -->
+        <div>
+          <label for="locality-search-input" class="sr-only">Search locality, city, landmark</label>
+          <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+            <i data-lucide="map-pin" class="w-5 h-5 text-slate-400 mr-3" aria-hidden="true"></i>
+            <input type="text" id="locality-search-input" name="locality" placeholder="Search locality, city, landmark (e.g. Connaught Place, Anand Vihar, BKC Mumbai, Whitefield)..." class="bg-transparent w-full text-sm text-white placeholder-slate-500 focus:outline-none" onkeydown="if(event.key === 'Enter') handleSearchSubmit()">
+            <button onclick="handleSearchSubmit()" class="ml-2 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition-all" aria-label="Submit locality search">
               Search
             </button>
           </div>
         </div>
 
         <!-- Quick Locality Chips -->
-        <div class="flex items-center flex-wrap gap-2 pt-1 text-xs text-slate-400">
-          <span class="font-medium text-slate-500 flex items-center"><i data-lucide="sparkles" class="w-3 h-3 mr-1 text-amber-400"></i> Popular:</span>
+        <div class="flex items-center flex-wrap gap-2 pt-1 text-xs text-slate-400" role="group" aria-label="Popular Indian Municipalities">
+          <span class="font-medium text-slate-500 flex items-center"><i data-lucide="sparkles" class="w-3 h-3 mr-1 text-amber-400" aria-hidden="true"></i> Popular:</span>
           <button onclick="selectQuickLocation('Connaught Place, Central Delhi', 28.6315, 77.2167)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Connaught Place (Delhi)</button>
           <button onclick="selectQuickLocation('Anand Vihar, East Delhi', 28.6508, 77.3152)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">Anand Vihar (Delhi)</button>
           <button onclick="selectQuickLocation('Bandra Kurla Complex (BKC), Mumbai', 19.0657, 72.8688)" class="px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">BKC (Mumbai)</button>
@@ -183,50 +195,50 @@
         </div>
 
         <!-- Geolocation Permission Dialog Note -->
-        <div id="geo-permission-banner" class="hidden bg-blue-950/40 border border-blue-800/50 rounded-xl p-3 text-xs text-blue-300 flex items-start justify-between">
+        <div id="geo-permission-banner" class="hidden bg-blue-950/40 border border-blue-800/50 rounded-xl p-3 text-xs text-blue-300 flex items-start justify-between" role="alert">
           <div class="flex items-start space-x-2">
-            <i data-lucide="info" class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5"></i>
+            <i data-lucide="info" class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
             <div>
               <span class="font-semibold text-white">Browser Geolocation Permission:</span>
               <p>NIRVAIR requires your explicit consent to retrieve coordinates via browser geolocation. Coordinates are processed locally and never stored without your permission.</p>
             </div>
           </div>
-          <button onclick="document.getElementById('geo-permission-banner').classList.add('hidden')" class="text-blue-400 hover:text-white ml-2">✕</button>
+          <button onclick="document.getElementById('geo-permission-banner').classList.add('hidden')" class="text-blue-400 hover:text-white ml-2" aria-label="Dismiss geolocation banner">✕</button>
         </div>
       </section>
 
       <!-- SIGNATURE ONBOARDING: PERCEPTION VS REALITY -->
-      <section id="perception-section" class="max-w-4xl mx-auto space-y-6">
+      <section id="perception-section" role="region" aria-labelledby="perception-heading" class="max-w-4xl mx-auto space-y-6">
         <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-700/50 space-y-6">
           <div class="text-center max-w-xl mx-auto space-y-2">
             <span class="text-xs uppercase font-extrabold tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">The Perception Test</span>
-            <h2 class="text-2xl sm:text-3xl font-bold text-white">What do you think the AQI around you is right now?</h2>
+            <h2 id="perception-heading" class="text-2xl sm:text-3xl font-bold text-white">What do you think the AQI around you is right now?</h2>
             <p class="text-sm text-slate-400">Before looking at sensors, gauge the atmosphere. What is your intuitive perception?</p>
           </div>
 
-          <!-- Category Selector Buttons (Indian National AQI) -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 pt-2" id="aqi-category-buttons">
-            <button onclick="selectPerceptionCategory('Good', 35)" class="cat-btn p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/15 text-center transition group">
+          <!-- Category Selector Buttons (Indian National AQI) with Radiogroup -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 pt-2" id="aqi-category-buttons" role="radiogroup" aria-label="Estimated AQI category">
+            <button onclick="selectPerceptionCategory('Good', 35)" role="radio" aria-checked="false" aria-label="Good, AQI 0 to 50" class="cat-btn p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/15 text-center transition group">
               <span class="block text-xs font-bold text-emerald-400">Good</span>
               <span class="block text-[11px] text-slate-400 font-mono mt-0.5">0 – 50</span>
             </button>
-            <button onclick="selectPerceptionCategory('Satisfactory', 75)" class="cat-btn p-3 rounded-xl border border-lime-500/30 bg-lime-500/5 hover:bg-lime-500/15 text-center transition group">
+            <button onclick="selectPerceptionCategory('Satisfactory', 75)" role="radio" aria-checked="false" aria-label="Satisfactory, AQI 51 to 100" class="cat-btn p-3 rounded-xl border border-lime-500/30 bg-lime-500/5 hover:bg-lime-500/15 text-center transition group">
               <span class="block text-xs font-bold text-lime-400">Satisfactory</span>
               <span class="block text-[11px] text-slate-400 font-mono mt-0.5">51 – 100</span>
             </button>
-            <button onclick="selectPerceptionCategory('Moderate', 150)" class="cat-btn p-3 rounded-xl border border-yellow-500/30 bg-yellow-500/5 hover:bg-yellow-500/15 text-center transition group">
+            <button onclick="selectPerceptionCategory('Moderate', 150)" role="radio" aria-checked="true" aria-label="Moderate, AQI 101 to 200" class="cat-btn p-3 rounded-xl border border-yellow-500/30 bg-yellow-500/15 ring-2 ring-yellow-500 text-center transition group">
               <span class="block text-xs font-bold text-yellow-400">Moderate</span>
               <span class="block text-[11px] text-slate-400 font-mono mt-0.5">101 – 200</span>
             </button>
-            <button onclick="selectPerceptionCategory('Poor', 250)" class="cat-btn p-3 rounded-xl border border-orange-500/30 bg-orange-500/5 hover:bg-orange-500/15 text-center transition group">
+            <button onclick="selectPerceptionCategory('Poor', 250)" role="radio" aria-checked="false" aria-label="Poor, AQI 201 to 300" class="cat-btn p-3 rounded-xl border border-orange-500/30 bg-orange-500/5 hover:bg-orange-500/15 text-center transition group">
               <span class="block text-xs font-bold text-orange-400">Poor</span>
               <span class="block text-[11px] text-slate-400 font-mono mt-0.5">201 – 300</span>
             </button>
-            <button onclick="selectPerceptionCategory('Very Poor', 350)" class="cat-btn p-3 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-center transition group">
+            <button onclick="selectPerceptionCategory('Very Poor', 350)" role="radio" aria-checked="false" aria-label="Very Poor, AQI 301 to 400" class="cat-btn p-3 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-center transition group">
               <span class="block text-xs font-bold text-red-400">Very Poor</span>
               <span class="block text-[11px] text-slate-400 font-mono mt-0.5">301 – 400</span>
             </button>
-            <button onclick="selectPerceptionCategory('Severe', 450)" class="cat-btn p-3 rounded-xl border border-rose-900/40 bg-rose-900/10 hover:bg-rose-900/20 text-center transition group">
+            <button onclick="selectPerceptionCategory('Severe', 450)" role="radio" aria-checked="false" aria-label="Severe, AQI 401 to 500+" class="cat-btn p-3 rounded-xl border border-rose-900/40 bg-rose-900/10 hover:bg-rose-900/20 text-center transition group">
               <span class="block text-xs font-bold text-rose-300">Severe</span>
               <span class="block text-[11px] text-slate-400 font-mono mt-0.5">401 – 500+</span>
             </button>
@@ -235,11 +247,11 @@
           <!-- Slider / Specific Number Input -->
           <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 space-y-3">
             <div class="flex items-center justify-between text-xs">
-              <span class="text-slate-400">Fine-tune your AQI estimate:</span>
-              <span class="font-mono font-bold text-white bg-slate-800 px-2.5 py-1 rounded text-sm" id="perception-slider-val">150</span>
+              <label for="perception-slider" class="text-slate-400">Fine-tune your AQI estimate:</label>
+              <span class="font-mono font-bold text-white bg-slate-800 px-2.5 py-1 rounded text-sm" id="perception-slider-val" aria-live="polite">150</span>
             </div>
-            <input type="range" id="perception-slider" min="0" max="500" value="150" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updatePerceptionSlider(this.value)">
-            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+            <input type="range" id="perception-slider" min="0" max="500" value="150" aria-valuemin="0" aria-valuemax="500" aria-valuenow="150" aria-valuetext="150, Moderate" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updatePerceptionSlider(this.value)">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono" aria-hidden="true">
               <span>0 (Clean)</span>
               <span>100 (Acceptable)</span>
               <span>200 (Moderate)</span>
@@ -251,15 +263,15 @@
 
           <!-- Reveal Reality Button -->
           <div class="text-center">
-            <button onclick="revealPerceptionVsReality()" id="btn-reveal-reality" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white font-extrabold text-base tracking-wide transition shadow-xl shadow-blue-500/25 flex items-center space-x-2 mx-auto">
-              <i data-lucide="eye" class="w-5 h-5"></i>
+            <button onclick="revealPerceptionVsReality()" id="btn-reveal-reality" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white font-extrabold text-base tracking-wide transition shadow-xl shadow-blue-500/25 flex items-center space-x-2 mx-auto" aria-label="Reveal perception versus reality comparison">
+              <i data-lucide="eye" class="w-5 h-5" aria-hidden="true"></i>
               <span>REVEAL PERCEPTION vs REALITY</span>
             </button>
           </div>
         </div>
 
-        <!-- THE REVEAL RESULT CARD (DYNAMICALLY POPULATED) -->
-        <div id="reveal-card-container" class="hidden">
+        <!-- THE REVEAL RESULT CARD (DYNAMICALLY POPULATED & ANNOUNCED VIA ARIA-LIVE) -->
+        <div id="reveal-card-container" class="hidden" role="status" aria-live="polite">
           <div class="glass-panel-elevated rounded-3xl p-6 sm:p-10 border border-slate-700 space-y-8 animate-fade-in">
             <!-- Header Banner -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700/80 pb-6 gap-4">
@@ -267,12 +279,12 @@
                 <span class="text-xs uppercase font-extrabold tracking-wider text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">Official Ground Truth Comparison</span>
                 <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-2" id="reveal-locality-title">Connaught Place, Central Delhi</h3>
                 <p class="text-xs text-slate-400 mt-1 flex items-center">
-                  <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-slate-500"></i>
+                  <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-slate-500" aria-hidden="true"></i>
                   <span>Last Updated: <strong class="text-slate-200" id="reveal-timestamp">Just Now</strong></span>
                 </p>
               </div>
               <div id="reveal-delta-badge" class="px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-bold flex items-center space-x-2">
-                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                <i data-lucide="alert-triangle" class="w-4 h-4" aria-hidden="true"></i>
                 <span id="reveal-delta-text">Underestimated by 95 points</span>
               </div>
             </div>
@@ -283,7 +295,7 @@
               <div class="bg-slate-900/80 rounded-2xl p-6 border border-slate-800 space-y-4">
                 <div class="flex items-center justify-between">
                   <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Your Perception</span>
-                  <i data-lucide="user" class="w-5 h-5 text-slate-500"></i>
+                  <i data-lucide="user" class="w-5 h-5 text-slate-500" aria-hidden="true"></i>
                 </div>
                 <div class="flex items-baseline space-x-3">
                   <span class="text-5xl font-black text-white font-mono" id="reveal-user-val">150</span>
@@ -314,7 +326,7 @@
             <div class="bg-blue-950/30 border border-blue-800/40 rounded-2xl p-5 space-y-3">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 text-slate-300">
                 <div class="flex items-center space-x-2">
-                  <i data-lucide="radio" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+                  <i data-lucide="radio" class="w-4 h-4 text-emerald-400 flex-shrink-0" aria-hidden="true"></i>
                   <span>Monitoring Station: <strong class="text-white font-semibold" id="reveal-station-name">Mandir Marg CAAQMS (DPCC/CPCB)</strong></span>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -324,7 +336,7 @@
               </div>
 
               <div class="border-t border-blue-900/50 pt-2.5 flex items-start space-x-2 text-xs text-amber-300/90 leading-relaxed">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5"></i>
+                <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
                 <p>
                   <strong class="font-bold text-amber-300">Station-Level vs Hyperlocal Limitation:</strong>
                   The nearest continuous regulatory station is <span id="reveal-station-dist-sub">1.6 km</span> away. Regulatory monitors gauge regional atmospheric airsheds. Hyperlocal air quality at your specific street corner or balcony will vary significantly based on adjacent vehicle flow, street canyon geometry, and open dust.
@@ -335,7 +347,7 @@
             <!-- Pollutant Breakdown Grid -->
             <div>
               <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
-                <i data-lucide="activity" class="w-3.5 h-3.5 mr-1.5 text-blue-400"></i>
+                <i data-lucide="activity" class="w-3.5 h-3.5 mr-1.5 text-blue-400" aria-hidden="true"></i>
                 <span>Constituent Pollutant Profile</span>
               </h4>
               <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="pollutant-cards-grid">
@@ -347,25 +359,25 @@
       </section>
 
       <!-- NEIGHBOURHOOD INTELLIGENCE MAP -->
-      <section class="max-w-6xl mx-auto space-y-6">
+      <section role="region" aria-labelledby="map-heading" class="max-w-6xl mx-auto space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <div class="flex items-center space-x-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              <h2 class="text-2xl font-extrabold text-white">Neighbourhood Intelligence Map</h2>
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500" aria-hidden="true"></span>
+              <h2 id="map-heading" class="text-2xl font-extrabold text-white">Neighbourhood Intelligence Map</h2>
             </div>
             <p class="text-sm text-slate-400 mt-1">
               Investigating potential nearby sources contributing to local particulate and gaseous loading.
             </p>
           </div>
-          <button onclick="openCitizenReportModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 text-xs font-bold transition flex items-center space-x-1.5">
-            <i data-lucide="flag" class="w-4 h-4"></i>
+          <button onclick="openCitizenReportModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-400 border border-blue-500/30 text-xs font-bold transition flex items-center space-x-1.5" aria-label="Open report form to log local pollution source">
+            <i data-lucide="flag" class="w-4 h-4" aria-hidden="true"></i>
             <span>Report Local Source</span>
           </button>
         </div>
 
         <!-- 4-Tier Source Classification Legend -->
-        <div class="flex flex-wrap items-center gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-2 text-xs" role="note" aria-label="Map classification legend">
           <span class="text-slate-500 font-semibold text-[11px] uppercase mr-1">Classification:</span>
           <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">● Verified Station</span>
           <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">● Mapped Infrastructure</span>
@@ -373,16 +385,16 @@
           <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">● AI-Generated Hypothesis</span>
         </div>
 
-        <!-- Interactive Map Container -->
+        <!-- Interactive Map Container with Accessible Text Fallback -->
         <div class="glass-panel rounded-2xl p-3 border border-slate-700/60 overflow-hidden">
-          <div id="neighbourhood-map" class="w-full h-[450px] rounded-xl z-10"></div>
+          <div id="neighbourhood-map" role="application" aria-label="Interactive map displaying monitoring stations and nearby pollution sources. Full textual list of all mapped sources is provided directly below." class="w-full h-[450px] rounded-xl z-10"></div>
         </div>
 
         <!-- Nearby Source Cards Grid -->
         <div class="space-y-3">
           <div class="flex items-center justify-between text-xs text-slate-400">
             <span class="font-bold text-white uppercase tracking-wider">Identified Local Sources & Hypotheses</span>
-            <span id="sources-count-badge">Scanning proximity...</span>
+            <span id="sources-count-badge" role="status" aria-live="polite">Scanning proximity...</span>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="neighbourhood-sources-grid">
             <!-- Dynamically populated -->
@@ -391,36 +403,36 @@
       </section>
 
       <!-- PERSONALISED ACTION INTELLIGENCE -->
-      <section class="max-w-6xl mx-auto space-y-6 pt-4 border-t border-slate-800">
+      <section role="region" aria-labelledby="action-intel-heading" class="max-w-6xl mx-auto space-y-6 pt-4 border-t border-slate-800">
         <div class="text-center max-w-2xl mx-auto space-y-2">
           <span class="text-xs uppercase font-extrabold tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">AI Action Engine</span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Personalised Action Intelligence</h2>
+          <h2 id="action-intel-heading" class="text-2xl sm:text-3xl font-extrabold text-white">Personalised Action Intelligence</h2>
           <p class="text-sm text-slate-400">Select your role to receive tailored, verifiable interventions grounded in live AQI and local evidence.</p>
         </div>
 
         <!-- Role Selector Tabs -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl mx-auto" id="role-selector-tabs">
-          <button onclick="selectUserRole('citizen')" id="role-btn-citizen" class="role-btn p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="user" class="w-5 h-5 text-blue-400"></i>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl mx-auto" id="role-selector-tabs" role="tablist" aria-label="User Roles">
+          <button onclick="selectUserRole('citizen')" id="role-btn-citizen" role="tab" aria-selected="true" class="role-btn p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
+            <i data-lucide="user" class="w-5 h-5 text-blue-400" aria-hidden="true"></i>
             <span>Citizen / Resident</span>
           </button>
-          <button onclick="selectUserRole('school')" id="role-btn-school" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="graduation-cap" class="w-5 h-5 text-emerald-400"></i>
+          <button onclick="selectUserRole('school')" id="role-btn-school" role="tab" aria-selected="false" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
+            <i data-lucide="graduation-cap" class="w-5 h-5 text-emerald-400" aria-hidden="true"></i>
             <span>School Admin</span>
           </button>
-          <button onclick="selectUserRole('society')" id="role-btn-society" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="building" class="w-5 h-5 text-amber-400"></i>
+          <button onclick="selectUserRole('society')" id="role-btn-society" role="tab" aria-selected="false" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
+            <i data-lucide="building" class="w-5 h-5 text-amber-400" aria-hidden="true"></i>
             <span>Housing Society (RWA)</span>
           </button>
-          <button onclick="selectUserRole('ward_officer')" id="role-btn-ward_officer" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
-            <i data-lucide="shield-check" class="w-5 h-5 text-purple-400"></i>
+          <button onclick="selectUserRole('ward_officer')" id="role-btn-ward_officer" role="tab" aria-selected="false" class="role-btn p-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-400 font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
+            <i data-lucide="shield-check" class="w-5 h-5 text-purple-400" aria-hidden="true"></i>
             <span>Ward Officer / Authority</span>
           </button>
         </div>
 
         <!-- Role Strategic Overview -->
-        <div id="role-strategic-summary" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 max-w-3xl mx-auto flex items-start space-x-3">
-          <i data-lucide="sparkles" class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5"></i>
+        <div id="role-strategic-summary" role="status" aria-live="polite" class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 max-w-3xl mx-auto flex items-start space-x-3">
+          <i data-lucide="sparkles" class="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
           <p id="role-summary-text">Generating tailored directives based on current air conditions...</p>
         </div>
 
@@ -429,7 +441,7 @@
           <!-- Immediate Actions -->
           <div class="space-y-4">
             <div class="flex items-center space-x-2 border-b border-red-500/30 pb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-red-400" aria-hidden="true"></span>
               <h3 class="text-sm font-extrabold uppercase tracking-wider text-red-300">Immediate Actions (Today)</h3>
             </div>
             <div class="space-y-3" id="actions-immediate-list">
@@ -440,7 +452,7 @@
           <!-- Short-Term Actions -->
           <div class="space-y-4">
             <div class="flex items-center space-x-2 border-b border-amber-500/30 pb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400" aria-hidden="true"></span>
               <h3 class="text-sm font-extrabold uppercase tracking-wider text-amber-300">Short-Term (7–30 Days)</h3>
             </div>
             <div class="space-y-3" id="actions-shortterm-list">
@@ -451,7 +463,7 @@
           <!-- Long-Term Actions -->
           <div class="space-y-4">
             <div class="flex items-center space-x-2 border-b border-blue-500/30 pb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400" aria-hidden="true"></span>
               <h3 class="text-sm font-extrabold uppercase tracking-wider text-blue-300">Long-Term (Structural)</h3>
             </div>
             <div class="space-y-3" id="actions-longterm-list">
@@ -465,18 +477,18 @@
     <!-- ============================================================== -->
     <!-- WORKFLOW B: PROFESSIONAL DATA ANALYSIS ENGINE                  -->
     <!-- ============================================================== -->
-    <div id="section-workflow-b" class="hidden space-y-8">
+    <div id="section-workflow-b" role="tabpanel" aria-labelledby="tab-btn-workflow-b" class="hidden space-y-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
         <div>
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <i data-lucide="database" class="w-3.5 h-3.5"></i>
+            <i data-lucide="database" class="w-3.5 h-3.5" aria-hidden="true"></i>
             <span>Institutional Data Trust Engine</span>
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Analyse My Data</h2>
           <p class="text-sm text-slate-400">Upload messy environmental sensor files, Excel sheets, or pasted tables for automated validation and trust auditing.</p>
         </div>
-        <button onclick="loadSampleMessyData()" class="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto">
-          <i data-lucide="file-code" class="w-4 h-4"></i>
+        <button onclick="loadSampleMessyData()" class="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto" aria-label="Load pre-built messy sample dataset to test data trust engine">
+          <i data-lucide="file-code" class="w-4 h-4" aria-hidden="true"></i>
           <span>Load Sample Messy Dataset</span>
         </button>
       </div>
@@ -484,39 +496,39 @@
       <!-- Ingestion Card -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- File Drag & Drop Zone -->
-        <div class="glass-panel rounded-2xl p-6 border-2 border-dashed border-slate-700 hover:border-blue-500/60 transition flex flex-col items-center justify-center text-center space-y-3 cursor-pointer" onclick="document.getElementById('data-file-input').click()">
+        <div class="glass-panel rounded-2xl p-6 border-2 border-dashed border-slate-700 hover:border-blue-500/60 transition flex flex-col items-center justify-center text-center space-y-3 cursor-pointer" onclick="document.getElementById('data-file-input').click()" onkeydown="if(event.key === 'Enter' || event.key === ' ') document.getElementById('data-file-input').click()" tabindex="0" role="button" aria-label="Upload CSV or Excel file">
           <input type="file" id="data-file-input" class="hidden" accept=".csv, .xlsx, .xls, .tsv, .txt" onchange="handleFileUpload(event)">
           <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+            <i data-lucide="upload-cloud" class="w-6 h-6" aria-hidden="true"></i>
           </div>
           <div>
             <span class="text-sm font-bold text-white">Upload CSV or Excel File</span>
-            <p class="text-xs text-slate-400 mt-1">Supports messy headers, missing values, timestamps, and inconsistent units (up to 15MB).</p>
+            <p class="text-xs text-slate-400 mt-1">Supports messy headers, missing values, timestamps, and inconsistent units (up to 10MB).</p>
           </div>
-          <span class="text-[11px] text-blue-400 font-mono">.csv, .xlsx, .xls, .tsv</span>
+          <span class="text-[11px] text-blue-400 font-mono">.csv, .xlsx, .xls, .tsv, .txt</span>
         </div>
 
         <!-- Raw Text Paste Box -->
         <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 flex flex-col space-y-3">
           <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-slate-300">Or Paste Tabular Text</span>
+            <label for="pasted-data-input" class="font-bold text-slate-300">Or Paste Tabular Text</label>
             <span class="text-slate-500 font-mono text-[11px]">CSV / TSV / Delimited</span>
           </div>
-          <textarea id="pasted-data-input" rows="4" placeholder="Date, PM2.5, Location&#10;2026-11-01 08:00, 45.2, Sector-4&#10;2026-11-01 09:00, -10.0, Sector-4&#10;2026-11-01 10:00, NA, Sector-4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-blue-500"></textarea>
-          <button onclick="handlePastedDataSubmit()" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">
+          <textarea id="pasted-data-input" rows="4" placeholder="Date, PM2.5, Location&#10;2026-11-01 08:00, 45.2, Sector-4&#10;2026-11-01 09:00, -10.0, Sector-4&#10;2026-11-01 10:00, NA, Sector-4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"></textarea>
+          <button onclick="handlePastedDataSubmit()" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition" aria-label="Process and validate pasted tabular data">
             Process Pasted Data
           </button>
         </div>
       </div>
 
       <!-- Analysis Results View -->
-      <div id="data-analysis-results" class="hidden space-y-6">
+      <div id="data-analysis-results" role="status" aria-live="polite" class="hidden space-y-6">
         <!-- 4-Tier Trust Metric Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div class="glass-panel rounded-xl p-4 border border-emerald-500/30 bg-emerald-500/5">
             <div class="flex items-center justify-between text-xs text-emerald-400 font-bold uppercase">
               <span>Reliable</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
             </div>
             <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-green">0</span>
             <span class="text-[11px] text-slate-400">Passes all range and validity checks</span>
@@ -525,7 +537,7 @@
           <div class="glass-panel rounded-xl p-4 border border-yellow-500/30 bg-yellow-500/5">
             <div class="flex items-center justify-between text-xs text-yellow-400 font-bold uppercase">
               <span>Suspicious</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-yellow-400" aria-hidden="true"></span>
             </div>
             <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-yellow">0</span>
             <span class="text-[11px] text-slate-400">Sudden spike or frozen sensor output</span>
@@ -534,7 +546,7 @@
           <div class="glass-panel rounded-xl p-4 border border-red-500/30 bg-red-500/5">
             <div class="flex items-center justify-between text-xs text-red-400 font-bold uppercase">
               <span>Invalid</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-red-400" aria-hidden="true"></span>
             </div>
             <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-red">0</span>
             <span class="text-[11px] text-slate-400">Negative or physically impossible value</span>
@@ -543,7 +555,7 @@
           <div class="glass-panel rounded-xl p-4 border border-slate-600/30 bg-slate-800/20">
             <div class="flex items-center justify-between text-xs text-slate-400 font-bold uppercase">
               <span>Insufficient</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-500" aria-hidden="true"></span>
             </div>
             <span class="text-3xl font-black text-white font-mono mt-2 block" id="stat-trust-grey">0</span>
             <span class="text-[11px] text-slate-400">Missing reading or unparseable text</span>
@@ -555,7 +567,7 @@
           <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 lg:col-span-2 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 class="text-sm font-bold text-white flex items-center">
-                <i data-lucide="calculator" class="w-4 h-4 mr-2 text-blue-400"></i>
+                <i data-lucide="calculator" class="w-4 h-4 mr-2 text-blue-400" aria-hidden="true"></i>
                 <span>Deterministic Statistical Profile (<span id="stats-target-col">PM2.5</span>)</span>
               </h3>
               <span class="text-xs text-slate-400" id="stats-total-rows">0 records</span>
@@ -590,7 +602,7 @@
             <!-- Trend Callout -->
             <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
               <div class="flex items-center space-x-2">
-                <i data-lucide="trending-up" class="w-4 h-4 text-purple-400"></i>
+                <i data-lucide="trending-up" class="w-4 h-4 text-purple-400" aria-hidden="true"></i>
                 <span>Longitudinal Trend: <strong class="text-white" id="stat-trend-direction">Stable</strong></span>
               </div>
               <span class="font-mono text-slate-400" id="stat-trend-change">0% shift</span>
@@ -601,7 +613,7 @@
           <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 space-y-3 flex flex-col justify-between">
             <div class="space-y-2">
               <div class="flex items-center space-x-2">
-                <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i>
+                <i data-lucide="cpu" class="w-4 h-4 text-emerald-400" aria-hidden="true"></i>
                 <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Gemini AI Audit</span>
               </div>
               <h4 class="text-sm font-bold text-white">Data Integrity Rating: <span id="ai-integrity-rating" class="text-emerald-400">High</span></h4>
@@ -620,22 +632,22 @@
         <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-white flex items-center">
-              <i data-lucide="shield-alert" class="w-4 h-4 mr-2 text-amber-400"></i>
+              <i data-lucide="shield-alert" class="w-4 h-4 mr-2 text-amber-400" aria-hidden="true"></i>
               <span>Audit Trail: Flagged & Suspicious Observations</span>
             </h3>
             <span class="text-xs text-slate-400" id="flagged-count-label">0 flagged items</span>
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full text-left text-xs border-collapse" aria-label="Flagged observations audit table">
               <thead>
                 <tr class="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
-                  <th class="py-2.5 px-3">Row #</th>
-                  <th class="py-2.5 px-3">Column</th>
-                  <th class="py-2.5 px-3">Original Value</th>
-                  <th class="py-2.5 px-3">Classification</th>
-                  <th class="py-2.5 px-3">Diagnostic Rationale</th>
-                  <th class="py-2.5 px-3">Calculation Status</th>
+                  <th scope="col" class="py-2.5 px-3">Row #</th>
+                  <th scope="col" class="py-2.5 px-3">Column</th>
+                  <th scope="col" class="py-2.5 px-3">Original Value</th>
+                  <th scope="col" class="py-2.5 px-3">Classification</th>
+                  <th scope="col" class="py-2.5 px-3">Diagnostic Rationale</th>
+                  <th scope="col" class="py-2.5 px-3">Calculation Status</th>
                 </tr>
               </thead>
               <tbody id="flagged-table-body" class="divide-y divide-slate-800/60 font-mono">
@@ -650,24 +662,24 @@
     <!-- ============================================================== -->
     <!-- WORKFLOW C: INTERVENTION TRACKING & HISTORICAL MEMORY          -->
     <!-- ============================================================== -->
-    <div id="section-workflow-c" class="hidden space-y-8">
+    <div id="section-workflow-c" role="tabpanel" aria-labelledby="tab-btn-workflow-c" class="hidden space-y-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
         <div>
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+            <i data-lucide="clock" class="w-3.5 h-3.5" aria-hidden="true"></i>
             <span>Persistent Civic Memory</span>
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Intervention Tracking & Longitudinal Memory</h2>
           <p class="text-sm text-slate-400">Track accountability, deadlines, and evaluate whether civic actions made a measurable difference over time.</p>
         </div>
-        <button onclick="evaluateInterventionComparison()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto shadow-lg shadow-purple-600/30">
-          <i data-lucide="git-compare" class="w-4 h-4"></i>
+        <button onclick="evaluateInterventionComparison()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center space-x-2 self-start sm:self-auto shadow-lg shadow-purple-600/30" aria-label="Evaluate longitudinal intervention impact">
+          <i data-lucide="git-compare" class="w-4 h-4" aria-hidden="true"></i>
           <span>Evaluate Intervention Impact</span>
         </button>
       </div>
 
       <!-- Historical Comparison Modal / Result Card -->
-      <div id="intervention-comparison-card" class="hidden glass-panel-elevated rounded-2xl p-6 sm:p-8 border border-purple-500/40 space-y-6">
+      <div id="intervention-comparison-card" role="status" aria-live="polite" class="hidden glass-panel-elevated rounded-2xl p-6 sm:p-8 border border-purple-500/40 space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-4 gap-2">
           <div>
             <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Before vs After Civic Comparison</span>
@@ -697,7 +709,7 @@
         <!-- Strict Scientific Guardrail: Correlation vs Causation -->
         <div class="bg-amber-950/30 border border-amber-800/40 rounded-xl p-4 text-xs text-amber-200 space-y-2">
           <div class="flex items-center space-x-2 text-amber-400 font-bold uppercase tracking-wider text-[11px]">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            <i data-lucide="shield-alert" class="w-4 h-4" aria-hidden="true"></i>
             <span>Scientific Attribution Guardrail: Correlation ≠ Causation</span>
           </div>
           <p id="cmp-attribution-notice" class="leading-relaxed">
@@ -711,6 +723,7 @@
         <div class="flex items-center justify-between text-xs text-slate-400">
           <span class="font-bold text-white uppercase tracking-wider">Active Civic Commitments</span>
           <div class="flex items-center space-x-2">
+            <label for="filter-intv-status" class="sr-only">Filter interventions by status</label>
             <select id="filter-intv-status" onchange="renderInterventionsList()" class="bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded px-2.5 py-1">
               <option value="all">All Statuses</option>
               <option value="proposed">Proposed</option>
@@ -728,19 +741,19 @@
     <!-- ============================================================== -->
     <!-- WORKFLOW D: CIVIC REPORTS GENERATION                           -->
     <!-- ============================================================== -->
-    <div id="section-workflow-d" class="hidden space-y-8">
+    <div id="section-workflow-d" role="tabpanel" aria-labelledby="tab-btn-workflow-d" class="hidden space-y-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
         <div>
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <i data-lucide="file-text" class="w-3.5 h-3.5" aria-hidden="true"></i>
             <span>Civic Communication</span>
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Civic & Public Health Reports</h2>
           <p class="text-sm text-slate-400">Generate executive municipal briefings or multilingual citizen advisories tailored for public protection.</p>
         </div>
         <div class="flex items-center space-x-2">
-          <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center space-x-1.5">
-            <i data-lucide="printer" class="w-4 h-4"></i>
+          <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center space-x-1.5" aria-label="Print or export report to PDF">
+            <i data-lucide="printer" class="w-4 h-4" aria-hidden="true"></i>
             <span>Export / Print</span>
           </button>
         </div>
@@ -750,7 +763,7 @@
       <div class="glass-panel rounded-2xl p-6 border border-slate-700/60 space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">Select Report Type</label>
+            <label for="report-type-select" class="block text-xs font-bold text-slate-300 mb-1.5">Select Report Type</label>
             <select id="report-type-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" onchange="handleReportTypeChange()">
               <option value="briefing">Internal Civic Briefing (Municipal / Environmental)</option>
               <option value="advisory">Citizen Advisory (General Public Health)</option>
@@ -758,7 +771,7 @@
           </div>
 
           <div id="report-lang-container" class="hidden">
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">Language</label>
+            <label for="report-lang-select" class="block text-xs font-bold text-slate-300 mb-1.5">Language</label>
             <select id="report-lang-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
               <option value="en">English</option>
               <option value="hi">हिंदी (Hindi)</option>
@@ -766,7 +779,7 @@
           </div>
 
           <div id="report-level-container" class="hidden">
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">Reading Level</label>
+            <label for="report-level-select" class="block text-xs font-bold text-slate-300 mb-1.5">Reading Level</label>
             <select id="report-level-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
               <option value="standard">Standard (Balanced clarity)</option>
               <option value="simple">Simple (Plain everyday words)</option>
@@ -775,15 +788,15 @@
           </div>
         </div>
 
-        <button onclick="generateReport()" id="btn-generate-report" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs transition flex items-center justify-center space-x-2">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        <button onclick="generateReport()" id="btn-generate-report" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs transition flex items-center justify-center space-x-2" aria-label="Generate civic briefing or citizen advisory with Gemini API">
+          <i data-lucide="sparkles" class="w-4 h-4" aria-hidden="true"></i>
           <span>Generate Report with Gemini</span>
         </button>
       </div>
 
-      <!-- Generated Report Display Area -->
-      <div id="report-output-card" class="glass-panel-elevated rounded-2xl p-8 border border-slate-700 space-y-4 print-only-container">
-        <div class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed" id="report-markdown-content">
+      <!-- Generated Report Display Area with Dynamic Language Tag -->
+      <div id="report-output-card" role="status" aria-live="polite" class="glass-panel-elevated rounded-2xl p-8 border border-slate-700 space-y-4 print-only-container">
+        <div class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed" id="report-markdown-content" lang="en">
           <p class="text-slate-400 italic">Click "Generate Report with Gemini" to produce the civic briefing or public advisory.</p>
         </div>
       </div>
@@ -791,28 +804,28 @@
   </main>
 
   <!-- ============================================================== -->
-  <!-- CITIZEN REPORT SUBMISSION MODAL                                -->
+  <!-- CITIZEN REPORT SUBMISSION MODAL (ACCESSIBLE DIALOG)            -->
   <!-- ============================================================== -->
-  <div id="citizen-report-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-panel-elevated rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4">
+  <div id="citizen-report-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="cr-modal-title" onkeydown="handleModalKeyDown(event)">
+    <div class="glass-panel-elevated rounded-2xl max-w-lg w-full p-6 border border-slate-700 space-y-4" role="document">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center">
-          <i data-lucide="flag" class="w-4 h-4 mr-2 text-amber-400"></i>
+        <h3 id="cr-modal-title" class="text-base font-bold text-white flex items-center">
+          <i data-lucide="flag" class="w-4 h-4 mr-2 text-amber-400" aria-hidden="true"></i>
           <span>Report Local Pollution Source</span>
         </h3>
-        <button onclick="closeCitizenReportModal()" class="text-slate-400 hover:text-white">✕</button>
+        <button onclick="closeCitizenReportModal()" class="text-slate-400 hover:text-white p-1 rounded-md" aria-label="Close report modal">✕</button>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Locality / Landmark</label>
-          <input type="text" id="cr-locality" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white" value="Current Selected Locality">
+          <label for="cr-locality" class="block font-semibold text-slate-300 mb-1">Locality / Landmark</label>
+          <input type="text" id="cr-locality" name="locality" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" value="Current Selected Locality">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Source Category</label>
-            <select id="cr-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+            <label for="cr-type" class="block font-semibold text-slate-300 mb-1">Source Category</label>
+            <select id="cr-type" name="report_type" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="waste_burning">Open Waste Burning</option>
               <option value="construction_dust">Visible Construction Dust</option>
               <option value="road_dust">Unpaved Road / Heavy Dust</option>
@@ -821,8 +834,8 @@
             </select>
           </div>
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Observed Severity</label>
-            <select id="cr-severity" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+            <label for="cr-severity" class="block font-semibold text-slate-300 mb-1">Observed Severity</label>
+            <select id="cr-severity" name="severity" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="low">Low (Minor visible haze)</option>
               <option value="moderate" selected>Moderate (Distinct plume)</option>
               <option value="high">High (Heavy dense smoke/dust)</option>
@@ -832,13 +845,13 @@
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Description & Evidence</label>
-          <textarea id="cr-desc" rows="3" placeholder="Provide specific details: e.g. smoldering trash heap near vacant plot, uncurtained sand excavation..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white"></textarea>
+          <label for="cr-desc" class="block font-semibold text-slate-300 mb-1">Description & Evidence</label>
+          <textarea id="cr-desc" name="description" rows="3" placeholder="Provide specific details: e.g. smoldering trash heap near vacant plot, uncurtained sand excavation..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
         </div>
       </div>
 
       <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
-        <button onclick="closeCitizenReportModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold">Cancel</button>
+        <button onclick="closeCitizenReportModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Cancel</button>
         <button onclick="submitCitizenReport()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">Submit Report</button>
       </div>
     </div>
@@ -847,7 +860,7 @@
   <!-- ============================================================== -->
   <!-- FOOTER                                                         -->
   <!-- ============================================================== -->
-  <footer class="border-t border-slate-800/80 bg-slate-950/60 py-6 text-xs text-slate-500 mt-auto">
+  <footer role="contentinfo" class="border-t border-slate-800/80 bg-slate-950/60 py-6 text-xs text-slate-500 mt-auto">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="flex items-center space-x-2">
         <span class="font-extrabold text-slate-300">NIRVAIR</span>

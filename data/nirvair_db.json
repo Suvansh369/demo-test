@@ -1,6 +1,39 @@
 {
   "citizen_reports": [
     {
+      "id": "cr-a9c69cf9",
+      "latitude": 28.63,
+      "longitude": 77.21,
+      "locality": "Connaught Place",
+      "report_type": "construction_dust",
+      "severity": "moderate",
+      "description": "Unit test report",
+      "timestamp": "2026-11-14T06:16:32.599Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-4d83acfe",
+      "latitude": 28.6,
+      "longitude": 77.2,
+      "locality": "Current Locality",
+      "report_type": "construction_dust",
+      "severity": "high",
+      "description": "alert(\"xss\")Heavy dust plume",
+      "timestamp": "2026-11-14T06:16:19.791Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-4a5936f2",
+      "latitude": 28.65,
+      "longitude": 77.31,
+      "locality": "Anand Vihar ISBT",
+      "report_type": "waste_burning",
+      "severity": "high",
+      "description": "E2E automated test: open garbage burning observed.",
+      "timestamp": "2026-11-14T06:15:13.185Z",
+      "status": "pending"
+    },
+    {
       "id": "cr-5f9f98dc",
       "latitude": 28.65,
       "longitude": 77.31,
@@ -68,6 +101,22 @@
     }
   ],
   "interventions": [
+    {
+      "id": "int-2015223c",
+      "locality": "Anand Vihar",
+      "role": "ward_officer",
+      "title": "E2E Mechanical Wet Sweeper Deployment",
+      "timeframe": "immediate",
+      "rationale": "Elevated roadside dust",
+      "evidence": "PM10 spike recorded",
+      "assigned_to": "Sanitation PWD",
+      "deadline": "2026-11-20",
+      "status": "completed",
+      "notes": "",
+      "verification_method": "GPS truck tracking logs",
+      "created_at": "2026-11-14T06:15:48.238Z",
+      "completed_at": "2026-11-14T06:15:48.238Z"
+    },
     {
       "id": "int-849ae7d2",
       "locality": "Koramangala, Bengaluru",
@@ -151,6 +200,45 @@
   ],
   "aqi_history": [
     {
+      "id": "snap-007b43b2",
+      "locality": "Selected Location (0.0000, 0.0000)",
+      "latitude": 0,
+      "longitude": 0,
+      "aqi": 44,
+      "category": "Good",
+      "pm25": 6.8,
+      "pm10": 13,
+      "station_name": "Regional Ambient",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T06:16:19.761Z"
+    },
+    {
+      "id": "snap-4218d27f",
+      "locality": "Anand Vihar, East Delhi",
+      "latitude": 28.6508,
+      "longitude": 77.3152,
+      "aqi": 112,
+      "category": "Moderate",
+      "pm25": 64.3,
+      "pm10": 86.8,
+      "station_name": "Anand Vihar CAAQMS",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T06:15:13.139Z"
+    },
+    {
+      "id": "snap-5e3f5837",
+      "locality": "Selected Location (28.6315, 77.2167)",
+      "latitude": 28.6315,
+      "longitude": 77.2167,
+      "aqi": 112,
+      "category": "Moderate",
+      "pm25": 64.3,
+      "pm10": 86.8,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 1.6,
+      "recorded_at": "2026-11-14T06:15:12.010Z"
+    },
+    {
       "id": "snap-acf57ed8",
       "locality": "Selected Location (28.6315, 77.2167)",
       "latitude": 28.6315,
@@ -230,6 +318,15 @@
     }
   ],
   "datasets": [
+    {
+      "id": "ds-1794636948222",
+      "filename": "messy_e2e.csv",
+      "uploaded_at": "2026-11-14T06:15:48.222Z",
+      "row_count": 8,
+      "valid_count": 2,
+      "flagged_count": 6,
+      "summary_json": "{\"count\":6,\"mean\":777.92,\"median\":340,\"p95\":1950,\"min\":42.5,\"max\":1950,\"stdDev\":917.51}"
+    },
     {
       "id": "ds-1794635097877",
       "filename": "messy_e2e.csv",

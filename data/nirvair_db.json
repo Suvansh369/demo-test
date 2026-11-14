@@ -1,6 +1,28 @@
 {
   "citizen_reports": [
     {
+      "id": "cr-52d97fe4",
+      "latitude": 28.6,
+      "longitude": 77.2,
+      "locality": "Current Locality",
+      "report_type": "construction_dust",
+      "severity": "high",
+      "description": "alert(\"xss\")Heavy dust plume",
+      "timestamp": "2026-11-14T08:35:36.043Z",
+      "status": "pending"
+    },
+    {
+      "id": "cr-20a0e640",
+      "latitude": 28.6,
+      "longitude": 77.2,
+      "locality": "Current Locality",
+      "report_type": "construction_dust",
+      "severity": "high",
+      "description": "alert(\"xss\")Heavy dust plume",
+      "timestamp": "2026-11-14T08:31:01.545Z",
+      "status": "pending"
+    },
+    {
       "id": "cr-18d54320",
       "latitude": 28.6508,
       "longitude": 77.3152,
@@ -1219,6 +1241,32 @@
     }
   ],
   "aqi_history": [
+    {
+      "id": "snap-9f8ed8c3",
+      "locality": "Selected Location (28.6315, 77.2167)",
+      "latitude": 28.6315,
+      "longitude": 77.2167,
+      "aqi": 396,
+      "category": "Very Poor",
+      "pm25": 245,
+      "pm10": 210,
+      "station_name": "Mandir Marg CAAQMS",
+      "station_distance_km": 1.6,
+      "recorded_at": "2026-11-14T08:31:02.077Z"
+    },
+    {
+      "id": "snap-7b42167d",
+      "locality": "Selected Location (0.0000, 0.0000)",
+      "latitude": 0,
+      "longitude": 0,
+      "aqi": 44,
+      "category": "Good",
+      "pm25": 6.9,
+      "pm10": 13.1,
+      "station_name": "Regional Ambient",
+      "station_distance_km": 0,
+      "recorded_at": "2026-11-14T08:31:01.515Z"
+    },
     {
       "id": "snap-c2bf6c76",
       "locality": "Anand Vihar, East Delhi",

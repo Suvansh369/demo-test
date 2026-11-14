@@ -16,7 +16,7 @@
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Google-Editorial Minimalist Design System -->
-  <link rel="stylesheet" href="/app.css?v=20261114_03">
+  <link rel="stylesheet" href="/app.css?v=20261114_04">
 </head>
 <body>
 
@@ -198,7 +198,7 @@
               </div>
             </div>
 
-            <form id="gateway-login-form" onsubmit="handleLoginSubmit(event)" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <form id="gateway-login-form" onsubmit="event.preventDefault(); handleLoginSubmit(event); return false;" style="display: flex; flex-direction: column; gap: 1.25rem;">
               <div id="login-error-alert" style="display: none; padding: 0.75rem; border-radius: 8px; background: #FCE8E6; color: #C5221F; font-size: 0.8125rem;" role="alert" aria-live="assertive"></div>
 
               <div>
@@ -211,7 +211,7 @@
                 <input type="password" id="login-password" name="password" value="google" required autocomplete="current-password" class="form-input" aria-label="Evaluator Password" placeholder="••••••••">
               </div>
 
-              <button type="submit" id="login-submit-btn" class="btn-primary" aria-label="Authenticate and proceed to data ingestion">
+              <button type="button" id="login-submit-btn" onclick="handleLoginSubmit(event)" class="btn-primary" aria-label="Authenticate and proceed to data ingestion">
                 Continue →
               </button>
             </form>
@@ -536,7 +536,7 @@ Keep windows closed during early morning rush hours.
       <button type="button" onclick="closeCitizenReportModal()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-secondary);" aria-label="Close incident reporting dialog">✕</button>
     </div>
 
-    <form id="citizen-report-form" onsubmit="submitCitizenIncident(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+    <form id="citizen-report-form" onsubmit="event.preventDefault(); submitCitizenIncident(event); return false;" style="display: flex; flex-direction: column; gap: 1rem;">
       <div>
         <label for="cr-locality" class="form-label">Locality / Landmark</label>
         <input type="text" id="cr-locality" name="locality" required class="form-input" aria-label="Enter incident locality" placeholder="e.g. Near Anand Vihar Terminal">
@@ -561,7 +561,7 @@ Keep windows closed during early morning rush hours.
 
       <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.5rem;">
         <button type="button" onclick="closeCitizenReportModal()" class="btn-secondary" aria-label="Cancel incident reporting">Cancel</button>
-        <button type="submit" class="btn-primary" style="width: auto;" aria-label="Submit verified incident report">Submit Incident Report</button>
+        <button type="button" onclick="submitCitizenIncident(event)" class="btn-primary" style="width: auto;" aria-label="Submit verified incident report">Submit Incident Report</button>
       </div>
     </form>
   </dialog>
@@ -570,6 +570,6 @@ Keep windows closed during early morning rush hours.
   <div id="toast-notification" role="status" aria-live="polite"></div>
 
   <!-- Main Application Logic Script (Cache-busted) -->
-  <script src="/app.js?v=20261114_03"></script>
+  <script src="/app.js?v=20261114_04"></script>
 </body>
 </html>
